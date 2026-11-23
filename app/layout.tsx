@@ -85,6 +85,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  verification: {
+    google: "_UZbb7Y13fcJnNV5dRTfQS2H9KnCTP5CHjDv3tVL6bM",
+  },
   category: "Career & Employment",
 };
 
@@ -181,6 +184,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <meta name="google-site-verification" content="_UZbb7Y13fcJnNV5dRTfQS2H9KnCTP5CHjDv3tVL6bM" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
