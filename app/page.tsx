@@ -9,6 +9,7 @@ import TailoredResume from "@/components/TailoredResume";
 import PricingDrawer from "@/components/PricingDrawer";
 import PaymentModal from "@/components/PaymentModal";
 import ShareBar from "@/components/ShareBar";
+import SeoFaqSection from "@/components/SeoFaqSection";
 import { KitData, GenerateResponse, ProPassData } from "@/lib/types";
 import {
   computeInputHash,
@@ -288,6 +289,9 @@ export default function Home() {
             <ShareBar />
           </div>
         )}
+
+        {/* SEO Educational Knowledge Base & FAQ Section for Google Ranking */}
+        <SeoFaqSection />
       </main>
 
       {/* FOOTER */}
