@@ -11,7 +11,10 @@ import {
   Loader2,
   Check,
   Zap,
+  X,
+  BookOpen,
 } from "lucide-react";
+import { SAMPLE_TEMPLATES } from "@/lib/sampleTemplates";
 
 interface InputSectionProps {
   resume: string;
@@ -23,101 +26,6 @@ interface InputSectionProps {
   error: string | null;
   cacheNotice?: string | null;
 }
-
-const DEMO_SAMPLES = {
-  tech: {
-    resume: `ALEX RIVERA
-Email: alex.rivera@email.com | Phone: +91 98765 43210 | Bengaluru, India
-LinkedIn: linkedin.com/in/alexrivera | GitHub: github.com/alexrivera-dev
-
-SUMMARY:
-Software Engineer with 3+ years of experience building modern web applications using React, Node.js, Express, and PostgreSQL. Passionate about clean code, REST APIs, and responsive frontend architecture.
-
-EXPERIENCE:
-Full Stack Developer | TechSolutions Labs | 2022 – Present
-• Developed and maintained 5+ customer-facing web portals using React, TypeScript, and Tailwind CSS.
-• Built backend REST endpoints with Node.js and Express to manage authentication and order processing.
-• Optimized PostgreSQL database queries, reducing response times on critical dashboards by 25%.
-• Collaborated with designers and QA testers in weekly sprint ceremonies to deliver client features.
-
-Junior Web Developer | CloudMinds Software | 2021 – 2022
-• Built responsive UI components using HTML5, CSS3, Tailwind CSS, and React.
-• Assisted in third-party API integrations and contributed to technical documentation.
-
-TECHNICAL SKILLS:
-Languages: JavaScript (ES6+), TypeScript, SQL, HTML5, CSS3
-Frameworks & Libraries: React, Node.js, Express, Tailwind CSS, Next.js
-Databases & Tools: PostgreSQL, MongoDB, Git, Postman, Docker, Linux
-
-EDUCATION:
-B.Tech in Computer Science & Engineering | VTU Karnataka (2017 – 2021)`,
-
-    jobDescription: `Senior Full-Stack Engineer (TypeScript, React, Microservices)
-Company: NexaScale Technologies
-Location: Bengaluru / Remote (India)
-
-About the Role:
-We are looking for a Senior Full-Stack Engineer to architect, build, and deploy resilient cloud-native microservices and high-performance web applications handling millions of transactions.
-
-Key Responsibilities:
-• Architect, build, and deploy resilient microservices using TypeScript, Node.js, and Docker.
-• Develop reactive, accessible frontend user experiences using React, Next.js, and state management.
-• Design distributed system architectures with Redis caching, PostgreSQL, and Kafka event streaming.
-• Champion automated testing (Jest, Cypress) and establish CI/CD deployment pipelines using GitHub Actions.
-• Lead engineering design reviews, mentor junior developers, and ensure 99.9% uptime for production services.
-
-Qualifications & Requirements:
-• 3+ years of professional full-stack software development experience.
-• Strong command of TypeScript, React, Node.js, and relational databases (PostgreSQL).
-• Hands-on experience with Microservices, Docker containerization, and AWS cloud infrastructure.
-• Proven track record with CI/CD pipelines, automated testing, and Redis caching.
-• Excellent communication skills and experience leading cross-functional agile teams.`,
-  },
-
-  pm: {
-    resume: `PRIYA SHARMA
-Bengaluru, India | priya.sharma@email.com | +91 98111 22334 | linkedin.com/in/priyasharma-pm
-
-PROFESSIONAL SUMMARY:
-Associate Product Manager with 3 years of experience shipping B2B SaaS features, leading scrum ceremonies, and optimizing user activation metrics. Skilled in user interviews, product roadmapping, and feature prioritization.
-
-WORK EXPERIENCE:
-Associate Product Manager | SaaSFlow Solutions | 2022 – Present
-• Owned the core onboarding funnel, improving user activation by 18% over two consecutive quarters.
-• Wrote detailed PRDs, user stories, and acceptance criteria for an engineering team of 7.
-• Analyzed product telemetry using Mixpanel and Google Analytics to identify user drop-offs.
-• Coordinated sprint planning, backlog grooming, and cross-team demos with UX and QA teams.
-
-Product Operations Specialist | NovaTech | 2021 – 2022
-• Gathered feedback from 100+ enterprise clients to prioritize bug triage and feature requests.
-• Created weekly metric dashboards for executive leadership highlighting churn trends.
-
-SKILLS:
-Product Roadmapping, Wireframing (Figma), Agile/Scrum, Mixpanel, Jira, SQL, A/B Testing, User Research
-
-EDUCATION:
-B.E. in Information Technology & MBA in Technology Management`,
-
-    jobDescription: `Senior Growth Product Manager
-Company: FinRocket Global
-Location: Bengaluru, India
-
-About the Role:
-We are searching for a high-velocity Senior Growth Product Manager to own our user acquisition and monetization flywheels. You will formulate hypotheses, design high-impact growth experiments, and drive viral retention loops.
-
-Responsibilities:
-• Lead growth product strategy focusing on activation, referral loops, and subscription checkout conversion.
-• Run rapid A/B testing cycles, analyzing statistical significance to validate product iterations.
-• Collaborate with Growth Marketing, Engineering, and Design to scale average revenue per user (ARPU).
-• Leverage Amplitude, SQL, and predictive analytics to forecast growth milestones.
-• Present data-driven quarterly growth roadmaps to executive C-suite stakeholders.
-
-Requirements:
-• 4+ years in product management with a focus on Growth, PLG (Product-Led Growth), or Monetization.
-• Deep expertise with statistical A/B testing, cohort retention analysis, and SQL queries.
-• Experience scaling consumer or B2B SaaS products from 10k to 500k+ MAU.`,
-  },
-};
 
 export const MAX_RESUME_CHARS = 8000;
 export const MAX_JOB_CHARS = 5000;
@@ -136,6 +44,8 @@ export default function InputSection({
 }: InputSectionProps) {
   const [copiedResume, setCopiedResume] = useState(false);
   const [copiedJob, setCopiedJob] = useState(false);
+  const [activeSampleId, setActiveSampleId] = useState<string | null>(null);
+  const [sampleTip, setSampleTip] = useState<{ id: string; label: string } | null>(null);
 
   const rLen = resume.trim().length;
   const jLen = jobDescription.trim().length;
@@ -153,6 +63,8 @@ export default function InputSection({
     try {
       const text = await navigator.clipboard.readText();
       setResume(text);
+      setActiveSampleId(null);
+      setSampleTip(null);
       setCopiedResume(true);
       setTimeout(() => setCopiedResume(false), 1500);
     } catch {
@@ -164,6 +76,8 @@ export default function InputSection({
     try {
       const text = await navigator.clipboard.readText();
       setJobDescription(text);
+      setActiveSampleId(null);
+      setSampleTip(null);
       setCopiedJob(true);
       setTimeout(() => setCopiedJob(false), 1500);
     } catch {
@@ -171,14 +85,20 @@ export default function InputSection({
     }
   };
 
-  const handleLoadDemo = (type: "tech" | "pm") => {
-    setResume(DEMO_SAMPLES[type].resume);
-    setJobDescription(DEMO_SAMPLES[type].jobDescription);
+  const handleLoadSample = (key: string) => {
+    const tmpl = SAMPLE_TEMPLATES[key];
+    if (!tmpl) return;
+    setResume(tmpl.resume);
+    setJobDescription(tmpl.jobDescription);
+    setActiveSampleId(key);
+    setSampleTip({ id: key, label: tmpl.label });
   };
 
   const handleClear = () => {
     setResume("");
     setJobDescription("");
+    setActiveSampleId(null);
+    setSampleTip(null);
   };
 
   return (
@@ -200,36 +120,71 @@ export default function InputSection({
           Check your ATS match score for free. Unlock your rewritten resume and 6 tailored interview
           Q&As for a one-time ₹49 payment—no subscriptions, no signup.
         </p>
-
-        {/* Demo Profile Buttons */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
-          <span className="text-slate-500 font-medium">Try with a demo profile:</span>
-          <button
-            type="button"
-            onClick={() => handleLoadDemo("tech")}
-            className="px-3.5 py-1.5 rounded-full bg-white border border-slate-300 hover:border-brand-500 hover:text-brand-600 font-medium transition shadow-xs text-slate-700 cursor-pointer"
-          >
-            💻 Full Stack / SDE-2
-          </button>
-          <button
-            type="button"
-            onClick={() => handleLoadDemo("pm")}
-            className="px-3.5 py-1.5 rounded-full bg-white border border-slate-300 hover:border-brand-500 hover:text-brand-600 font-medium transition shadow-xs text-slate-700 cursor-pointer"
-          >
-            🚀 Product Manager
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="px-3 py-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-          >
-            Clear
-          </button>
-        </div>
       </div>
 
       {/* INPUT CARD */}
       <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-5 sm:p-8 transition-all">
+        {/* 1. TRY A SAMPLE RESUME & JOB BAR */}
+        <div className="mb-6 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-50 via-brand-50/30 to-indigo-50/30 border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
+              <BookOpen className="w-4 h-4 text-brand-600" />
+              Don&apos;t have a resume handy? Try a sample:
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {Object.values(SAMPLE_TEMPLATES).map((tmpl) => {
+                const isActive = activeSampleId === tmpl.id;
+                return (
+                  <button
+                    key={tmpl.id}
+                    type="button"
+                    onClick={() => handleLoadSample(tmpl.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition shadow-2xs border cursor-pointer ${
+                      isActive
+                        ? "bg-brand-600 text-white border-brand-600 shadow-brand-500/20 ring-2 ring-brand-300"
+                        : "bg-white text-slate-700 border-slate-200 hover:border-brand-400 hover:text-brand-600"
+                    }`}
+                  >
+                    {tmpl.pill}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {(resume || jobDescription) && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="self-end sm:self-auto px-3 py-1.5 rounded-full text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition cursor-pointer flex items-center gap-1 shrink-0 bg-white"
+              title="Clear both boxes"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Clear</span>
+            </button>
+          )}
+        </div>
+
+        {/* 2. BLUE TIP BANNER WHEN SAMPLE LOADED */}
+        {sampleTip && (
+          <div className="mb-6 p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 animate-fade-in flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <Info className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>
+                <strong>{sampleTip.label}</strong> sample loaded! Edit the details with your own name &amp; experience, or click <strong>&quot;Make My Resume Ready&quot;</strong> to test it.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSampleTip(null)}
+              className="text-blue-500 hover:text-blue-800 p-1 cursor-pointer shrink-0"
+              aria-label="Dismiss tip"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Cache Hit Notification */}
         {cacheNotice && (
           <div className="mb-6 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 animate-fade-in flex items-center justify-between gap-3 text-xs">
@@ -289,7 +244,11 @@ export default function InputSection({
               <textarea
                 id="resumeInput"
                 value={resume}
-                onChange={(e) => setResume(e.target.value)}
+                onChange={(e) => {
+                  setResume(e.target.value);
+                  setActiveSampleId(null);
+                  setSampleTip(null);
+                }}
                 maxLength={MAX_RESUME_CHARS + 500}
                 rows={12}
                 disabled={isLoading}
@@ -348,7 +307,11 @@ export default function InputSection({
               <textarea
                 id="jobInput"
                 value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
+                onChange={(e) => {
+                  setJobDescription(e.target.value);
+                  setActiveSampleId(null);
+                  setSampleTip(null);
+                }}
                 maxLength={MAX_JOB_CHARS + 500}
                 rows={12}
                 disabled={isLoading}
