@@ -6,6 +6,7 @@ import InputSection from "@/components/InputSection";
 import ScoreCard from "@/components/ScoreCard";
 import InterviewQuestions from "@/components/InterviewQuestions";
 import TailoredResume from "@/components/TailoredResume";
+import PricingComparison from "@/components/PricingComparison";
 import PaymentModal from "@/components/PaymentModal";
 import { KitData, GenerateResponse, ProPassData } from "@/lib/types";
 import {
@@ -257,6 +258,12 @@ export default function Home() {
               questions={kitData.interviewQuestions}
               isUnlocked={isUnlocked}
               onOpenPaywall={() => setIsPaywallOpen(true)}
+            />
+
+            {/* Free vs. ₹49 Pro Pass Comparison Table */}
+            <PricingComparison
+              onOpenPaywall={() => setIsPaywallOpen(true)}
+              isUnlocked={isUnlocked}
             />
 
             {/* Tailored ATS Resume (Locked behind ₹49 with blurred overlay) */}

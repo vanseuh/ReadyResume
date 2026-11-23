@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import confetti from "canvas-confetti";
+import PricingComparison from "./PricingComparison";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -171,6 +172,9 @@ export default function PaymentModal({
               Unlock Full Kit + 10-Day Pro Pass (10 Tailored Resumes/Day) — ₹{unlockPrice} One-Time.
             </p>
           </div>
+
+          {/* Condensed Comparison of what unlocks */}
+          <PricingComparison variant="condensed" />
 
           {/* DYNAMIC SCANNABLE UPI QR CODE & DIRECT INTENT */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center">
