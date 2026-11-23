@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Sparkles,
   Clipboard,
@@ -13,8 +13,11 @@ import {
   Zap,
   X,
   BookOpen,
+  FileText,
+  Upload,
 } from "lucide-react";
 import { SAMPLE_TEMPLATES } from "@/lib/sampleTemplates";
+import { extractTextFromPdfFile } from "@/lib/pdfParser";
 
 interface InputSectionProps {
   resume: string;
@@ -46,6 +49,97 @@ export default function InputSection({
   const [copiedJob, setCopiedJob] = useState(false);
   const [activeSampleId, setActiveSampleId] = useState<string | null>(null);
   const [sampleTip, setSampleTip] = useState<{ id: string; label: string } | null>(null);
+  
+  // Resume PDF Upload state
+  const [isParsingPdf, setIsParsingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfSuccessNotice, setPdfSuccessNotice] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Job Description File Upload state (.pdf, .txt, .md)
+  const [isParsingJobFile, setIsParsingJobFile] = useState(false);
+  const [jobFileError, setJobFileError] = useState<string | null>(null);
+  const [jobFileSuccessNotice, setJobFileSuccessNotice] = useState<string | null>(null);
+  const jobFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsParsingPdf(true);
+    setPdfError(null);
+    setPdfSuccessNotice(null);
+
+    try {
+      const result = await extractTextFromPdfFile(file);
+      if (result.error) {
+        setPdfError(result.error);
+      } else if (result.text) {
+        setResume(result.text);
+        setActiveSampleId(null);
+        setSampleTip(null);
+        setPdfSuccessNotice(`Successfully extracted ${result.text.length.toLocaleString()} characters from "${file.name}"!`);
+        setTimeout(() => setPdfSuccessNotice(null), 4000);
+      }
+    } catch (err: unknown) {
+      const errorMsg = (err as Error)?.message || "Failed to parse PDF.";
+      setPdfError(errorMsg);
+    } finally {
+      setIsParsingPdf(false);
+      // Reset input value so re-uploading the same file triggers onChange
+      if (e.target) {
+        e.target.value = "";
+      }
+    }
+  };
+
+  const handleJobFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsParsingJobFile(true);
+    setJobFileError(null);
+    setJobFileSuccessNotice(null);
+
+    try {
+      const lowerName = file.name.toLowerCase();
+      let extractedText = "";
+
+      if (lowerName.endsWith(".pdf") || file.type === "application/pdf") {
+        const result = await extractTextFromPdfFile(file);
+        if (result.error) {
+          setJobFileError(result.error);
+          return;
+        }
+        extractedText = result.text;
+      } else {
+        // Text / Markdown file reading
+        const rawText = await file.text();
+        extractedText = rawText.replace(/\s+/g, " ").trim();
+      }
+
+      if (extractedText.length < 50) {
+        setJobFileError("The uploaded file does not contain enough text (minimum 50 characters required).");
+        return;
+      }
+
+      // Cap at MAX_JOB_CHARS (5,000)
+      const capped = extractedText.slice(0, MAX_JOB_CHARS);
+      setJobDescription(capped);
+      setActiveSampleId(null);
+      setSampleTip(null);
+      setJobFileSuccessNotice(`Successfully extracted ${capped.length.toLocaleString()} characters from "${file.name}" into Job Description!`);
+      setTimeout(() => setJobFileSuccessNotice(null), 4000);
+    } catch (err: unknown) {
+      const errorMsg = (err as Error)?.message || "Failed to parse job description file.";
+      setJobFileError(errorMsg);
+    } finally {
+      setIsParsingJobFile(false);
+      if (e.target) {
+        e.target.value = "";
+      }
+    }
+  };
 
   const rLen = resume.trim().length;
   const jLen = jobDescription.trim().length;
@@ -213,16 +307,109 @@ export default function InputSection({
           </div>
         )}
 
+        {/* PDF Parse Alerts */}
+        {pdfError && (
+          <div className="mb-6 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 animate-fade-in flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{pdfError}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPdfError(null)}
+              className="text-rose-500 hover:text-rose-800 p-1 cursor-pointer shrink-0"
+              aria-label="Dismiss error"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        {pdfSuccessNotice && (
+          <div className="mb-6 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 animate-fade-in flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{pdfSuccessNotice}</span>
+            </div>
+            <span className="px-2 py-0.5 rounded-md bg-emerald-200/70 text-emerald-800 font-bold text-[10px]">
+              CLIENT PARSED (0 TOKENS)
+            </span>
+          </div>
+        )}
+
+        {/* Job Description File Parse Alerts */}
+        {jobFileError && (
+          <div className="mb-6 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 animate-fade-in flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{jobFileError}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setJobFileError(null)}
+              className="text-rose-500 hover:text-rose-800 p-1 cursor-pointer shrink-0"
+              aria-label="Dismiss error"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        {jobFileSuccessNotice && (
+          <div className="mb-6 p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-900 animate-fade-in flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-indigo-600 shrink-0" />
+              <span>{jobFileSuccessNotice}</span>
+            </div>
+            <span className="px-2 py-0.5 rounded-md bg-indigo-200/70 text-indigo-800 font-bold text-[10px]">
+              CLIENT PARSED (0 TOKENS)
+            </span>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* RESUME INPUT */}
           <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-2.5">
-              <label htmlFor="resumeInput" className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 inline-flex items-center justify-center text-xs font-bold">
-                  1
-                </span>
-                Paste Your Current Resume
-              </label>
+            {/* Hidden PDF File Input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".pdf,application/pdf"
+              className="hidden"
+              onChange={handlePdfUpload}
+            />
+
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div className="flex items-center gap-2.5">
+                <label htmlFor="resumeInput" className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 inline-flex items-center justify-center text-xs font-bold">
+                    1
+                  </span>
+                  Current Resume
+                </label>
+
+                {/* 📄 Client-side PDF Upload Button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading || isParsingPdf}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-white hover:bg-brand-50 text-brand-700 border border-brand-200 hover:border-brand-400 transition cursor-pointer shadow-2xs"
+                  title="Upload a text-based PDF resume (extracted 100% locally in your browser)"
+                >
+                  {isParsingPdf ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-600" />
+                      <span>Extracting PDF...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="w-3.5 h-3.5 text-brand-600" />
+                      <span>Upload PDF</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
               <div className="flex items-center gap-2 text-xs">
                 {rLen > MAX_RESUME_CHARS ? (
                   <span className="text-[11px] text-rose-600 font-bold">
@@ -279,13 +466,46 @@ export default function InputSection({
 
           {/* JOB DESCRIPTION INPUT */}
           <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-2.5">
-              <label htmlFor="jobInput" className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 inline-flex items-center justify-center text-xs font-bold">
-                  2
-                </span>
-                Paste Target Job Description
-              </label>
+            {/* Hidden Job Description File Input */}
+            <input
+              type="file"
+              ref={jobFileInputRef}
+              accept=".pdf,.txt,.md,application/pdf,text/plain"
+              className="hidden"
+              onChange={handleJobFileUpload}
+            />
+
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div className="flex items-center gap-2.5">
+                <label htmlFor="jobInput" className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 inline-flex items-center justify-center text-xs font-bold">
+                    2
+                  </span>
+                  Target Job Description
+                </label>
+
+                {/* 📄 Upload Job Description Button */}
+                <button
+                  type="button"
+                  onClick={() => jobFileInputRef.current?.click()}
+                  disabled={isLoading || isParsingJobFile}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 hover:border-indigo-400 transition cursor-pointer shadow-2xs"
+                  title="Upload a PDF or TXT job description (extracted 100% locally in your browser)"
+                >
+                  {isParsingJobFile ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                      <span>Extracting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Upload JD</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
               <div className="flex items-center gap-2 text-xs">
                 {jLen > MAX_JOB_CHARS ? (
                   <span className="text-[11px] text-rose-600 font-bold">

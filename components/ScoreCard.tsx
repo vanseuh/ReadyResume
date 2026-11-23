@@ -1,14 +1,77 @@
 "use client";
 
 import React from "react";
-import { Search, Award, CheckCircle2, TrendingUp } from "lucide-react";
-import { KitData } from "@/lib/types";
+import { Search, Award, CheckCircle2, TrendingUp, AlertCircle, Sparkles } from "lucide-react";
+import { KitData, KeywordGapItem } from "@/lib/types";
 
 interface ScoreCardProps {
   data: KitData;
   onScrollToResume: () => void;
   onOpenPaywall: () => void;
   isUnlocked: boolean;
+}
+
+interface NormalizedKeyword {
+  keyword: string;
+  description: string;
+  status: string;
+  isGood: boolean;
+}
+
+function normalizeKeyword(item: string | KeywordGapItem, rank: number): NormalizedKeyword {
+  if (typeof item === "object" && item !== null && item.keyword) {
+    const isGood = typeof item.isGood === "boolean"
+      ? item.isGood
+      : /good|easy|match|minor/i.test(item.status || "");
+
+    const defaultStatus = isGood
+      ? "Easy Fix (Good Potential)"
+      : rank === 1
+      ? "Critical Gap (Bad)"
+      : rank === 2
+      ? "High Priority Gap (Bad)"
+      : "Needs Addition";
+
+    const defaultDescriptions = [
+      `Missing in resume • Add ${item.keyword} metrics under Work Experience to turn this into a strong recruiter match (+8%).`,
+      `Not detected by ATS • Highlight practical application of ${item.keyword} in technical skills & project bullets.`,
+      `Employer priority • Incorporate ${item.keyword} into core competencies to pass screening filters.`,
+      `Moderate gap • Mention ${item.keyword} tools & workflow experience to strengthen role alignment.`,
+      `Quick win • Add ${item.keyword} to summary or certifications for maximum keyword density boost.`,
+    ];
+
+    return {
+      keyword: item.keyword,
+      description: item.description || defaultDescriptions[rank - 1] || `Incorporate ${item.keyword} into your bullet points.`,
+      status: item.status || defaultStatus,
+      isGood,
+    };
+  }
+
+  const kw = String(item || "").trim();
+  const isGood = rank >= 4;
+  const defaultStatus = rank === 1
+    ? "Critical Gap (Bad)"
+    : rank === 2
+    ? "High Priority Gap (Bad)"
+    : rank === 3
+    ? "Needs Addition"
+    : "Easy Fix (Good Potential)";
+
+  const defaultDescriptions = [
+    `Missing in resume • Add ${kw} metrics under Work Experience to turn this into a strong recruiter match (+8%).`,
+    `Not detected by ATS • Highlight practical application of ${kw} in technical skills & project bullets.`,
+    `Employer priority • Incorporate ${kw} into core competencies to pass screening filters.`,
+    `Moderate gap • Mention ${kw} tools & workflow experience to strengthen role alignment.`,
+    `Quick win • Add ${kw} to summary or certifications for maximum keyword density boost.`,
+  ];
+
+  return {
+    keyword: kw || "Core Technical Competency",
+    description: defaultDescriptions[rank - 1] || `Incorporate ${kw} in your resume bullets to optimize ATS keyword density.`,
+    status: defaultStatus,
+    isGood,
+  };
 }
 
 export default function ScoreCard({
@@ -132,32 +195,63 @@ export default function ScoreCard({
               or methodologies missing from your resume that the target employer prioritizes:
             </p>
 
-            {/* Missing Keyword Badges */}
-            <div className="space-y-2.5">
+            {/* Missing Keyword Badges with Ranking, Good/Bad Status & Faded Actionable Description */}
+            <div className="space-y-3">
               {data.missingKeywords && data.missingKeywords.length > 0 ? (
-                data.missingKeywords.slice(0, 5).map((kw, idx) => {
+                data.missingKeywords.slice(0, 5).map((rawKw, idx) => {
+                  const kw = normalizeKeyword(rawKw, idx + 1);
                   const c = keywordColors[idx % keywordColors.length];
+
                   return (
                     <div
                       key={idx}
-                      className={`p-3 rounded-xl ${c.bg} border ${c.border} flex items-center justify-between gap-3`}
+                      className={`p-3.5 rounded-2xl ${c.bg} border ${c.border} flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition hover:shadow-2xs`}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-start gap-3 flex-grow">
+                        {/* Rank Badge */}
                         <span
-                          className={`w-6 h-6 rounded-full ${c.num} flex items-center justify-center font-bold text-xs shrink-0`}
+                          className={`w-6 h-6 rounded-full ${c.num} flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-2xs`}
                         >
                           {idx + 1}
                         </span>
-                        <span className={`text-xs sm:text-sm font-bold ${c.text}`}>{kw}</span>
+
+                        <div className="flex-grow">
+                          {/* Top Row: Bold Keyword Title + Good/Bad Status Pill */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-xs sm:text-sm font-bold ${c.text}`}>
+                              {kw.keyword}
+                            </span>
+
+                            {/* Good vs Bad Indicator */}
+                            <span
+                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shadow-2xs ${
+                                kw.isGood
+                                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                  : "bg-rose-50 text-rose-800 border-rose-200"
+                              }`}
+                            >
+                              {kw.status}
+                            </span>
+                          </div>
+
+                          {/* Short Highlighted Description (Not Bold, Faded Whitish / Muted) */}
+                          <p className="text-[11px] sm:text-xs font-normal text-slate-500/90 mt-1 leading-snug">
+                            {kw.description}
+                          </p>
+                        </div>
                       </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/90 border border-slate-200 text-slate-600">
-                        Priority Gap
-                      </span>
+
+                      {/* Right: Impact Tag */}
+                      <div className="shrink-0 self-end sm:self-center">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/95 border border-slate-200 text-slate-600 shadow-2xs whitespace-nowrap">
+                          {idx === 0 ? "🔥 Rank #1 Priority" : idx === 1 ? "⚡ High Impact" : "🎯 Priority Gap"}
+                        </span>
+                      </div>
                     </div>
                   );
                 })
               ) : (
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500">
                   No critical keyword gaps detected.
                 </div>
               )}
@@ -188,6 +282,29 @@ export default function ScoreCard({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* CURRENT VS PROJECTED ATS SCORE VISUAL HOOK */}
+        <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-slate-50 via-emerald-50/50 to-teal-50/50 border border-emerald-200/80 shadow-2xs">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-slate-500">Current ATS Match Score:</span>
+              <span className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-black text-slate-800">
+                {score}%
+              </span>
+            </div>
+            <span className="text-emerald-500 font-bold hidden sm:inline">➔</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-emerald-800">Projected Score After ReadyResume:</span>
+              <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs flex items-center gap-1">
+                <span>92%–98%</span>
+                <span>✅</span>
+              </span>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-600 font-medium text-center md:text-right">
+            ReadyResume rewrite injects all 5 priority keyword gaps into verified recruiter-ready bullet points.
+          </p>
         </div>
       </div>
     </div>

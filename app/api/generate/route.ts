@@ -163,7 +163,14 @@ Respond with parseable JSON matching this schema:
 {
   "atsScore": 75,
   "scoreCategory": "Strong Contender",
-  "missingKeywords": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],
+  "missingKeywords": [
+    {
+      "keyword": "PostgreSQL & Query Optimization",
+      "description": "Missing in resume • Add query indexing metrics under Work Experience to turn this into a strong match.",
+      "status": "Critical Gap",
+      "isGood": false
+    }
+  ],
   "tailoredResume": {
     "fullName": "Name from resume",
     "targetTitle": "Target role title",
@@ -207,7 +214,7 @@ Respond with parseable JSON matching this schema:
 
 STRICT CONSTRAINTS:
 1. ATS Score (0-100%): Realistic score based on skill overlap.
-2. missingKeywords: Exactly 3 to 5 top critical missing keywords from job description.
+2. missingKeywords: Exactly 3 to 5 top critical missing keywords ranked by priority. Each is an object with "keyword", a short 1-sentence "description" on what to improve or how to make it good, "status" ("Critical Gap", "Needs Addition", or "Good Potential"), and "isGood" (boolean).
 3. tailoredResume: Keep bullets punchy, direct, and metric-focused without fluff.
 4. interviewQuestions: Provide exactly 6 questions (IDs 1 to 6: exactly 3 technical + 3 behavioral) with crisp 3-4 sentence total STAR answers.
 5. Return JSON ONLY. No markdown wrapper, no preamble.`;
@@ -218,40 +225,49 @@ ${resume.trim()}
 JOB DESCRIPTION:
 ${jobDescription.trim()}`;
 
-    // 5. Query LLM with strict max_tokens cap
+    // 5. Query LLM with strict max_tokens cap and automatic retry for transient 503 spikes
     const openai = new OpenAI({
       apiKey,
       baseURL,
     });
 
-    let completion;
-    try {
-      completion = await openai.chat.completions.create({
+    const callLlm = async (useJsonFormat: boolean) => {
+      const options: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
         model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        response_format: { type: "json_object" },
         temperature: 0.2,
-        max_tokens: 2400, // Capped to conserve token budget while preventing JSON truncation
-      });
-    } catch (apiErr: unknown) {
-      const err = apiErr as Error;
-      if (/response_format|json_object|unsupported/i.test(err.message)) {
-        console.warn("Retrying without response_format json_object...");
-        completion = await openai.chat.completions.create({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: 0.2,
-          max_tokens: 2400,
-        });
-      } else {
-        throw apiErr;
+        max_tokens: 2400,
+      };
+      if (useJsonFormat) {
+        options.response_format = { type: "json_object" };
       }
+      return await openai.chat.completions.create(options);
+    };
+
+    let completion;
+    try {
+      try {
+        completion = await callLlm(true);
+      } catch (firstErr: unknown) {
+        const errStr = String((firstErr as Error)?.message || firstErr);
+        // If unsupported response_format, try without it
+        if (/response_format|json_object|unsupported/i.test(errStr)) {
+          console.warn("Retrying without response_format json_object...");
+          completion = await callLlm(false);
+        } else if (/503|high demand|UNAVAILABLE|overloaded/i.test(errStr)) {
+          // Automatic 1x retry on transient 503 spikes with a 2-second delay
+          console.warn("Upstream 503 high demand detected. Retrying after 2 seconds...");
+          await new Promise((r) => setTimeout(r, 2000));
+          completion = await callLlm(true);
+        } else {
+          throw firstErr;
+        }
+      }
+    } catch (apiErr: unknown) {
+      throw apiErr;
     }
 
     // 6. Live Token Usage Tracker (Server Console Logs)
@@ -324,17 +340,47 @@ ${jobDescription.trim()}`;
     const error = err as Error;
     console.error("API /api/generate Error:", error);
 
-    const isRateLimit = /rate limit|429|quota/i.test(error.message);
-    const friendlyMessage = isRateLimit
-      ? "LLM API rate limit reached. Please wait a moment and try again."
-      : error.message || "An error occurred while generating your career kit.";
+    let rawMsg = error.message || "An unexpected error occurred.";
+    let statusCode = 500;
+
+    // Check if error message is wrapped in JSON (e.g. {"error": {"message": "..."}})
+    try {
+      const jsonStart = rawMsg.indexOf("{");
+      const jsonEnd = rawMsg.lastIndexOf("}");
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        const parsedErr = JSON.parse(rawMsg.slice(jsonStart, jsonEnd + 1));
+        if (parsedErr?.error?.message) {
+          rawMsg = parsedErr.error.message;
+        } else if (parsedErr?.message) {
+          rawMsg = parsedErr.message;
+        }
+      }
+    } catch {
+      // Keep original rawMsg
+    }
+
+    let friendlyMessage = rawMsg;
+
+    if (/hourly rate limit|5 generations per hour/i.test(rawMsg)) {
+      statusCode = 429;
+      friendlyMessage =
+        "The upstream AI provider reached its hourly limit (5 requests/hour on free desktop proxy). Tip: Set a free Groq Cloud API key in .env.local for unlimited, instantaneous 300 token/sec generations!";
+    } else if (/high demand|unavailable|503|overloaded/i.test(rawMsg)) {
+      statusCode = 503;
+      friendlyMessage =
+        "The AI model is experiencing a momentary traffic spike. Please wait 10 seconds and try clicking 'Make My Resume Ready' again.";
+    } else if (/rate limit|429|quota/i.test(rawMsg)) {
+      statusCode = 429;
+      friendlyMessage =
+        "Upstream AI rate limit reached. Please wait a moment before submitting your next analysis.";
+    }
 
     return NextResponse.json(
       {
         success: false,
         error: friendlyMessage,
       },
-      { status: isRateLimit ? 429 : 500 }
+      { status: statusCode }
     );
   }
 }

@@ -9,9 +9,15 @@ interface HeaderProps {
   isUnlocked: boolean;
   proPass: ProPassData | null;
   onOpenPaywall: () => void;
+  onOpenPricing?: () => void;
 }
 
-export default function Header({ isUnlocked, proPass, onOpenPaywall }: HeaderProps) {
+export default function Header({
+  isUnlocked,
+  proPass,
+  onOpenPaywall,
+  onOpenPricing,
+}: HeaderProps) {
   const remainingToday = proPass
     ? Math.max(0, 10 - (proPass.dailyUsage?.count || 0))
     : 0;
@@ -57,7 +63,18 @@ export default function Header({ isUnlocked, proPass, onOpenPaywall }: HeaderPro
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {onOpenPricing && (
+              <button
+                type="button"
+                onClick={onOpenPricing}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-brand-700 transition px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer shadow-2xs"
+                title="View Free vs 10-Day Pro Pass comparison"
+              >
+                <span>Compare Plans</span>
+              </button>
+            )}
+
             {proPass || isUnlocked ? (
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm">
                 <ShieldCheck className="w-3.5 h-3.5 text-white" />

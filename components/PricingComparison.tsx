@@ -1,235 +1,263 @@
 "use client";
 
 import React from "react";
-import { Check, Lock, Sparkles, Zap, ShieldCheck } from "lucide-react";
+import { Check, X as XIcon, Zap, ShieldCheck, Sparkles, ArrowRight, ArrowUp } from "lucide-react";
 
 interface PricingComparisonProps {
-  variant?: "full" | "condensed";
   onOpenPaywall?: () => void;
   isUnlocked?: boolean;
 }
 
 export default function PricingComparison({
-  variant = "full",
   onOpenPaywall,
   isUnlocked = false,
 }: PricingComparisonProps) {
-  const comparisonRows = [
-    {
-      feature: "ATS Match Score & Missing Keywords",
-      free: "Included (Instant breakdown)",
-      freeIncluded: true,
-      pro: "Included (Instant breakdown)",
-      proIncluded: true,
-    },
-    {
-      feature: "Tailored Interview Q&As",
-      free: "First 2 questions only",
-      freeIncluded: true,
-      freeNote: "Q1 & Q2 free",
-      pro: "All 6 role-specific & behavioral Q&As",
-      proIncluded: true,
-    },
-    {
-      feature: "AI-Rewritten ATS Resume",
-      free: "Locked / Blurred",
-      freeIncluded: false,
-      pro: "Full custom resume for every job",
-      proIncluded: true,
-    },
-    {
-      feature: "Clean Printable PDF Download",
-      free: "Locked",
-      freeIncluded: false,
-      pro: "Unlimited instant multi-page PDF exports",
-      proIncluded: true,
-    },
-    {
-      feature: "Daily Generation Limit",
-      free: "3 tries / hour",
-      freeIncluded: true,
-      freeNote: "Rate limited",
-      pro: "10 tailored resumes/day for 10 full days",
-      proIncluded: true,
-      proHighlight: true,
-    },
-    {
-      feature: "Subscription / Hidden Fees",
-      free: "None (100% Free preview)",
-      freeIncluded: true,
-      pro: "One-time ₹49 UPI payment (No recurring fees)",
-      proIncluded: true,
-      proHighlight: true,
-    },
-  ];
-
-  if (variant === "condensed") {
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden text-xs">
-        <div className="bg-slate-50 px-3.5 py-2 border-b border-slate-200 flex items-center justify-between font-bold text-slate-800">
-          <span>What Unlocks with Pro Pass:</span>
-          <span className="text-brand-600 font-extrabold">₹49 One-Time</span>
-        </div>
-        <div className="p-3 space-y-2 text-slate-700">
-          <div className="flex items-start gap-2">
-            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>
-              <strong>All 6 STAR Interview Q&amp;As</strong> (unlocks remaining 4 behavioral &amp; technical answers)
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>
-              <strong>Full Rewritten ATS Resume</strong> optimized with target keywords &amp; metrics
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>
-              <strong>Clean Printable Multi-Page PDF Kit</strong> for recruiters &amp; print
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>
-              <strong>10 Tailored Resumes/Day for 10 Days</strong> (100 total generations allowed)
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>
-              <strong>Zero Subscriptions:</strong> One-time UPI payment directly to bank account
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleScrollToInput = () => {
+    const el = document.getElementById("inputSection");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-5 sm:p-8 overflow-hidden">
-      {/* Section Header */}
-      <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 mb-2">
+    <section id="pricingSection" className="mb-14 scroll-mt-20">
+      {/* SECTION HEADER */}
+      <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 mb-3 shadow-2xs">
           <Sparkles className="w-3.5 h-3.5 text-brand-600" />
-          <span>Transparent Pricing • No Hidden Costs</span>
+          <span>Simple, Transparent Pricing • No Subscriptions</span>
         </div>
-        <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-          Free Preview vs. 10-Day Pro Pass
-        </h3>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Start for free to test your ATS match score, then unlock the full kit &amp; 10 daily tailored resumes whenever you&apos;re ready.
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Simple, Transparent Pricing —{" "}
+          <span className="bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent">
+            No Subscriptions
+          </span>
+        </h2>
+        <p className="text-sm sm:text-base text-slate-600 mt-2">
+          Test your ATS score completely free. Unlock unlimited custom resumes and complete interview answers for a single ₹49 UPI payment.
         </p>
       </div>
 
-      {/* Comparison Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {/* COLUMN 1: FREE PREVIEW */}
-        <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-5 sm:p-6 flex flex-col justify-between">
+      {/* 2-CARD SIDE-BY-SIDE COMPARISON WINDOW */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto items-stretch">
+        {/* ========================================================= */}
+        {/* LEFT CARD: FREE PREVIEW (₹0) */}
+        {/* ========================================================= */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm hover:shadow-md transition flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+            {/* Header */}
+            <div className="flex items-start justify-between pb-5 border-b border-slate-100 gap-4">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Tier 1
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-1.5">
+                  Starter Tier
                 </span>
-                <h4 className="text-lg font-bold text-slate-900">Free Preview</h4>
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
+                  Free Preview — Test Your Score
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Instant benchmark against recruiter screening filters
+                </p>
               </div>
-              <div className="text-right">
-                <span className="text-2xl font-black text-slate-900">₹0</span>
-                <span className="block text-[10px] text-slate-400 font-medium">Free Forever</span>
+
+              <div className="text-right shrink-0">
+                <span className="text-3xl sm:text-4xl font-black text-slate-900">₹0</span>
+                <span className="block text-[11px] text-slate-400 font-medium">Free Forever</span>
               </div>
             </div>
 
-            <ul className="mt-4 space-y-3.5 text-xs">
-              {comparisonRows.map((row, idx) => (
-                <li key={idx} className="flex items-start gap-2.5">
-                  {row.freeIncluded ? (
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  ) : (
-                    <Lock className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                  )}
-                  <div>
-                    <span className="font-semibold text-slate-800">{row.feature}: </span>
-                    <span className={row.freeIncluded ? "text-slate-600" : "text-slate-400 italic"}>
-                      {row.free}
-                    </span>
-                  </div>
-                </li>
-              ))}
+            {/* Feature List */}
+            <ul className="mt-6 space-y-3.5 text-xs sm:text-sm">
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <span className="text-slate-700">
+                  <strong>Instant ATS Match Score</strong> (0–100%)
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <span className="text-slate-700">
+                  <strong>Top 5 Missing Job Keywords</strong> gap breakdown
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <span className="text-slate-700">
+                  <strong>First 2 Tailored Interview Q&amp;As</strong> with STAR answers
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <span className="text-slate-700">
+                  <strong>3 Free Previews per Hour</strong> (Instant evaluation)
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3 text-slate-400">
+                <div className="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <XIcon className="w-3.5 h-3.5" />
+                </div>
+                <span>Full AI-Rewritten ATS Resume (Locked)</span>
+              </li>
+
+              <li className="flex items-start gap-3 text-slate-400">
+                <div className="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <XIcon className="w-3.5 h-3.5" />
+                </div>
+                <span>Complete 6-Question Interview Kit (Locked)</span>
+              </li>
+
+              <li className="flex items-start gap-3 text-slate-400">
+                <div className="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <XIcon className="w-3.5 h-3.5" />
+                </div>
+                <span>Clean Printable PDF Download (Locked)</span>
+              </li>
             </ul>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-200 text-center">
-            <span className="text-xs font-medium text-slate-500">
-              Current active view (ATS score &amp; 2 free STAR Q&amp;As)
-            </span>
+          {/* CTA Footer */}
+          <div className="mt-8 pt-5 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={handleScrollToInput}
+              className="w-full py-3 px-4 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] transition flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer"
+            >
+              <ArrowUp className="w-4 h-4 text-slate-500" />
+              <span>Use Free Preview Above</span>
+            </button>
+            <p className="text-center text-[11px] text-slate-400 mt-2 font-medium">
+              No credit card, no sign-up, no hidden strings
+            </p>
           </div>
         </div>
 
-        {/* COLUMN 2: 10-DAY PRO PASS (HIGHLIGHTED) */}
-        <div className="rounded-2xl border-2 border-brand-500 bg-gradient-to-b from-brand-50/60 via-white to-indigo-50/30 p-5 sm:p-6 relative shadow-md shadow-brand-500/10 flex flex-col justify-between">
-          {/* Badge */}
-          <div className="absolute -top-3 right-4">
-            <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-extrabold bg-brand-600 text-white shadow-sm uppercase tracking-wide">
-              ⚡ Most Popular • No Auto-Renewal
+        {/* ========================================================= */}
+        {/* RIGHT CARD: 10-DAY PRO PASS (₹49 ONE-TIME) */}
+        {/* ========================================================= */}
+        <div className="relative bg-gradient-to-b from-brand-50/80 via-white to-indigo-50/40 rounded-3xl border-2 border-brand-500 p-6 sm:p-8 shadow-xl shadow-brand-500/10 flex flex-col justify-between">
+          {/* Top Badge */}
+          <div className="absolute -top-3.5 right-6">
+            <span className="inline-flex items-center gap-1 px-3.5 py-1 rounded-full text-xs font-black bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md uppercase tracking-wider">
+              🔥 MOST POPULAR • NO AUTO-RENEWAL
             </span>
           </div>
 
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-brand-200">
+            {/* Header */}
+            <div className="flex items-start justify-between pb-5 border-b border-brand-200/80 gap-4">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-brand-700">
-                  Full Access
-                </span>
-                <h4 className="text-lg font-black text-slate-900 flex items-center gap-1.5">
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-brand-100 text-brand-800 mb-1.5">
                   10-Day Pro Pass
-                </h4>
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                  Full Interview-Ready Kit
+                </h3>
+                <p className="text-xs text-brand-800/80 mt-0.5 font-medium">
+                  Everything you need to apply &amp; clear recruiter rounds
+                </p>
               </div>
-              <div className="text-right">
+
+              <div className="text-right shrink-0">
                 <div className="flex items-baseline gap-1.5 justify-end">
-                  <span className="text-2xl font-black text-brand-700">₹49</span>
-                  <span className="text-xs text-slate-400 line-through">₹499</span>
+                  <span className="text-3xl sm:text-4xl font-black text-brand-700">₹49</span>
+                  <span className="text-xs sm:text-sm text-slate-400 line-through">₹499</span>
                 </div>
-                <span className="block text-[10px] text-emerald-700 font-bold">One-Time Payment</span>
+                <span className="block text-[11px] text-emerald-700 font-bold">One-Time UPI Payment</span>
               </div>
             </div>
 
-            <ul className="mt-4 space-y-3.5 text-xs">
-              {comparisonRows.map((row, idx) => (
-                <li key={idx} className="flex items-start gap-2.5">
-                  <div className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3 h-3 text-emerald-700 stroke-[3]" />
-                  </div>
-                  <div>
-                    <span className="font-bold text-slate-900">{row.feature}: </span>
-                    <span className={row.proHighlight ? "text-brand-900 font-bold" : "text-slate-700 font-medium"}>
-                      {row.pro}
-                    </span>
-                  </div>
-                </li>
-              ))}
+            {/* Feature List */}
+            <ul className="mt-6 space-y-3.5 text-xs sm:text-sm">
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+                <span className="text-slate-800">
+                  <strong>Everything in Free Preview</strong> (Score &amp; Keyword Gap breakdown)
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+                <span className="text-slate-900">
+                  <strong>Full AI-Rewritten ATS Resume</strong> tailored specifically for every job
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+                <span className="text-slate-900">
+                  <strong>All 6 Role-Specific &amp; Behavioral Interview Q&amp;As</strong> with full STAR responses
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+                <span className="text-slate-900">
+                  <strong>Unlimited Clean PDF Downloads &amp; 1-Click Copy</strong> for instant submissions
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                </div>
+                <span className="text-brand-950 font-bold bg-brand-100/50 px-1 rounded">
+                  10 Tailored Resumes Per Day for 10 Full Days (Up to 100 kits!)
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+                <span className="text-slate-800">
+                  <strong>Zero Subscriptions</strong> — Pay ₹49 once via UPI, never charged again
+                </span>
+              </li>
             </ul>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-brand-200">
+          {/* CTA Footer */}
+          <div className="mt-8 pt-5 border-t border-brand-200/80">
             {isUnlocked ? (
-              <div className="py-2.5 px-4 rounded-xl bg-emerald-600 text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-sm">
-                <ShieldCheck className="w-4 h-4" />
-                <span>10-Day Pro Pass Unlocked</span>
+              <div className="py-3 px-4 rounded-xl bg-emerald-600 text-white font-bold text-xs sm:text-sm text-center flex items-center justify-center gap-2 shadow-sm">
+                <ShieldCheck className="w-4 h-4 text-emerald-200" />
+                <span>✅ Active on Your Device (10 Generations / Day)</span>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={onOpenPaywall}
-                className="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 active:scale-[0.99] transition shadow-md shadow-brand-500/25 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer"
+                className="w-full py-3.5 px-5 rounded-xl font-extrabold text-white bg-gradient-to-r from-brand-600 via-indigo-600 to-brand-700 hover:from-brand-700 hover:to-indigo-800 active:scale-[0.99] transition shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer"
               >
-                <Zap className="w-4 h-4 text-amber-300" />
-                <span>Unlock Full Kit + 10-Day Pro Pass (₹49)</span>
+                <span>Get 10-Day Pro Pass for ₹49</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             )}
+            <p className="text-center text-[11px] text-brand-800/80 mt-2 font-medium">
+              Instant activation via GPay, PhonePe, Paytm, or BHIM UPI
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

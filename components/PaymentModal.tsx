@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import confetti from "canvas-confetti";
-import PricingComparison from "./PricingComparison";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -152,29 +151,23 @@ export default function PaymentModal({
 
         {/* Modal Scrollable Body */}
         <div className="p-5 sm:p-7 space-y-5 overflow-y-auto flex-grow text-slate-800">
-          {/* Price Banner with 10-Day Pro Pass Feature */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50/70 border border-brand-200/80">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-brand-800 flex items-center gap-1.5">
+          {/* Compact Price & Pass Banner */}
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50/70 border border-brand-200/80 flex items-center justify-between gap-3">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-800 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-brand-600" />
-                10-Day Pro Pass Access
+                10-Day Pro Pass
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                10 Resumes / Day
-              </span>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 flex items-baseline gap-2 mt-0.5">
+                ₹{unlockPrice}{" "}
+                <span className="text-xs text-slate-400 line-through font-normal">₹499</span>
+                <span className="text-[11px] text-emerald-700 font-semibold">• One-Time UPI</span>
+              </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 flex items-baseline gap-2">
-              ₹{unlockPrice}{" "}
-              <span className="text-xs text-slate-400 line-through font-normal">₹499</span>
-              <span className="text-xs font-medium text-slate-500">• One-time payment (no subscription)</span>
-            </div>
-            <p className="text-xs text-slate-600 mt-2 font-medium">
-              Unlock Full Kit + 10-Day Pro Pass (10 Tailored Resumes/Day) — ₹{unlockPrice} One-Time.
-            </p>
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+              10 Resumes / Day
+            </span>
           </div>
-
-          {/* Condensed Comparison of what unlocks */}
-          <PricingComparison variant="condensed" />
 
           {/* DYNAMIC SCANNABLE UPI QR CODE & DIRECT INTENT */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center">

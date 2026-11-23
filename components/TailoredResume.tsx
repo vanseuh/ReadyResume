@@ -87,10 +87,11 @@ export default function TailoredResume({
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopyText}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5"
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-2xs"
+            title="Copy rewritten resume text to clipboard"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? "Copied!" : "Copy Text"}</span>
+            <span>{copied ? "Copied!" : "📋 Copy Resume Text"}</span>
           </button>
 
           <button
@@ -104,6 +105,29 @@ export default function TailoredResume({
         </div>
       </div>
 
+      {/* "Current vs. Projected ATS Score" Visual Hook Banner */}
+      {!isUnlocked && (
+        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-brand-50/70 via-indigo-50/70 to-emerald-50/70 border border-brand-200/90 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+          <div className="flex flex-wrap items-center gap-2.5 text-xs">
+            <span className="font-semibold text-slate-600">Current Match:</span>
+            <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 font-extrabold text-slate-800">
+              {data.atsScore}%
+            </span>
+            <span className="text-emerald-500 font-bold">➔</span>
+            <span className="font-semibold text-emerald-800">Projected ATS Score After Optimization:</span>
+            <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs">
+              92%–98% ✅
+            </span>
+          </div>
+          <button
+            onClick={onOpenPaywall}
+            className="text-xs font-bold text-brand-700 hover:text-brand-900 underline underline-offset-2 shrink-0 cursor-pointer"
+          >
+            Unlock Custom ATS Resume (₹49) &rarr;
+          </button>
+        </div>
+      )}
+
       {/* Content Wrapper with Paywall Blur */}
       <div className="relative min-h-[450px]">
         {/* PAYWALL OVERLAY WHEN LOCKED */}
@@ -113,9 +137,14 @@ export default function TailoredResume({
               <div className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <Lock className="w-7 h-7 text-brand-600" />
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 mb-2">
-                🔒 Premium Kit Locked
-              </span>
+
+              {/* Current vs Projected Score Badge inside paywall */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-800 mb-3">
+                <span>Current: {data.atsScore}%</span>
+                <span className="text-emerald-400">➔</span>
+                <span className="text-emerald-700 font-extrabold">Projected: 92–98% ✅</span>
+              </div>
+
               <h4 className="text-lg font-bold text-slate-900 mb-2">
                 Unlock Full Kit + 10-Day Pro Pass
               </h4>

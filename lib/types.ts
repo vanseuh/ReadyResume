@@ -36,10 +36,17 @@ export interface TailoredResume {
   education: string;
 }
 
+export interface KeywordGapItem {
+  keyword: string;
+  description?: string; // Short actionable tip on how to make it good
+  status?: string;      // e.g. "Critical Gap", "Needs Improvement", "Easy Fix"
+  isGood?: boolean;     // Whether it's a good match or bad gap
+}
+
 export interface KitData {
   atsScore: number;
   scoreCategory?: string;
-  missingKeywords: string[];
+  missingKeywords: Array<string | KeywordGapItem>;
   tailoredResume: TailoredResume;
   interviewQuestions: InterviewQuestion[];
 }

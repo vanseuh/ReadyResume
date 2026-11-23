@@ -6,8 +6,9 @@ import InputSection from "@/components/InputSection";
 import ScoreCard from "@/components/ScoreCard";
 import InterviewQuestions from "@/components/InterviewQuestions";
 import TailoredResume from "@/components/TailoredResume";
-import PricingComparison from "@/components/PricingComparison";
+import PricingDrawer from "@/components/PricingDrawer";
 import PaymentModal from "@/components/PaymentModal";
+import ShareBar from "@/components/ShareBar";
 import { KitData, GenerateResponse, ProPassData } from "@/lib/types";
 import {
   computeInputHash,
@@ -19,7 +20,7 @@ import {
   incrementProUsage,
   formatExpiryDate,
 } from "@/lib/cacheUtils";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Sparkles } from "lucide-react";
 
 export default function Home() {
   const [resume, setResume] = useState("");
@@ -31,6 +32,7 @@ export default function Home() {
   const [proPass, setProPass] = useState<ProPassData | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   // Restore 10-Day Pro Pass and Session from localStorage on mount (0 tokens)
   useEffect(() => {
@@ -211,7 +213,22 @@ export default function Home() {
         isUnlocked={isUnlocked}
         proPass={proPass}
         onOpenPaywall={() => setIsPaywallOpen(true)}
+        onOpenPricing={() => setIsPricingOpen(true)}
       />
+
+      {/* RIGHT-SIDEBAR BUTTON TRIGGER (Docked to Right Edge) */}
+      <button
+        type="button"
+        onClick={() => setIsPricingOpen(true)}
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-30 bg-white/95 hover:bg-brand-50 text-slate-700 hover:text-brand-700 border-y border-l border-slate-300 shadow-lg py-3 px-1.5 rounded-l-xl text-xs font-bold transition flex flex-col items-center gap-1.5 cursor-pointer group"
+        title="Open Plan Comparison Sidebar (Free vs ₹49 Pro Pass)"
+        aria-label="Compare Plans"
+      >
+        <Sparkles className="w-3.5 h-3.5 text-brand-600 group-hover:scale-110 transition" />
+        <span className="[writing-mode:vertical-rl] tracking-wider text-[10px] uppercase font-bold text-slate-600 group-hover:text-brand-700">
+          Compare Plans
+        </span>
+      </button>
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Pro Daily Cap Warning Banner */}
@@ -260,43 +277,75 @@ export default function Home() {
               onOpenPaywall={() => setIsPaywallOpen(true)}
             />
 
-            {/* Free vs. ₹49 Pro Pass Comparison Table */}
-            <PricingComparison
-              onOpenPaywall={() => setIsPaywallOpen(true)}
-              isUnlocked={isUnlocked}
-            />
-
             {/* Tailored ATS Resume (Locked behind ₹49 with blurred overlay) */}
             <TailoredResume
               data={kitData}
               isUnlocked={isUnlocked}
               onOpenPaywall={() => setIsPaywallOpen(true)}
             />
+
+            {/* Multi-Platform Share Bar (Post-Analysis & Post-Unlock) */}
+            <ShareBar />
           </div>
         )}
       </main>
 
       {/* FOOTER */}
-      <footer className="mt-16 bg-white border-t border-slate-200 py-8 px-4 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold">
-              R
-            </div>
-            <span className="font-bold text-slate-800">ReadyResume</span>
-            <span>• Self-Service ATS Career Kit & 10-Day Pro Pass</span>
+      <footer className="mt-16 bg-white border-t border-slate-200 py-10 px-4 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Subtle Compact Share Bar in Footer */}
+          <div className="py-2 border-b border-slate-100">
+            <ShareBar compact={true} />
           </div>
-          <div className="flex items-center gap-4 text-slate-500">
-            <span>Server-side Llama AI</span>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold">
+                R
+              </div>
+              <span className="font-bold text-slate-800">ReadyResume</span>
+              <span>• Self-Service ATS Career Kit & 10-Day Pro Pass</span>
+            </div>
+            <div className="flex items-center gap-4 text-slate-500">
+              <button
+                type="button"
+                onClick={() => setIsPricingOpen(true)}
+                className="text-brand-600 hover:underline font-semibold cursor-pointer"
+              >
+                Compare Plans
+              </button>
+              <span>•</span>
+              <span>Server-side Llama AI</span>
+              <span>•</span>
+              <span>Zero Visitor Keys Required</span>
+              <span>•</span>
+              <button onClick={handleResetDemo} className="text-slate-500 hover:text-slate-700 hover:underline cursor-pointer">
+                Reset Session
+              </button>
+            </div>
+          </div>
+
+          {/* Privacy & Trust Assurance Notice */}
+          <div className="pt-2 text-[11px] text-slate-400 border-t border-slate-50 flex items-center justify-center gap-1.5 flex-wrap">
+            <span>🔒 Privacy First: Your resume data is processed securely and never stored on our servers</span>
             <span>•</span>
-            <span>Zero Visitor Keys Required</span>
+            <span>Instant ₹49 UPI Unlock</span>
             <span>•</span>
-            <button onClick={handleResetDemo} className="text-brand-600 hover:underline cursor-pointer">
-              Reset Session
-            </button>
+            <span>No Auto-Renewal</span>
           </div>
         </div>
       </footer>
+
+      {/* LEFT-SIDEBAR PLAN COMPARISON DRAWER */}
+      <PricingDrawer
+        isOpen={isPricingOpen}
+        onClose={() => setIsPricingOpen(false)}
+        onOpenPaywall={() => {
+          setIsPricingOpen(false);
+          setIsPaywallOpen(true);
+        }}
+        isUnlocked={isUnlocked}
+      />
 
       {/* ₹49 PAYWALL MODAL */}
       <PaymentModal
