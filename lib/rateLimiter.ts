@@ -180,3 +180,71 @@ export function getClientIp(req: Request): string {
   }
   return "127.0.0.1";
 }
+
+// ==========================================
+// 3. ADMIN ANALYTICS & AUDIT LOGGING
+// ==========================================
+
+export interface TransactionRecord {
+  id: string;
+  utr: string;
+  timestamp: number;
+  ip: string;
+  amount: number;
+  status: "verified" | "flagged";
+}
+
+export interface ActivityRecord {
+  id: string;
+  timestamp: number;
+  type: "free_preview" | "pro_generation" | "pro_unlock";
+  ip: string;
+  utr?: string;
+}
+
+const transactions: TransactionRecord[] = [];
+const activityList: ActivityRecord[] = [];
+const seenIps = new Set<string>();
+
+export function logTransaction(record: Omit<TransactionRecord, "id">) {
+  const id = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  transactions.unshift({ ...record, id });
+  if (transactions.length > 100) transactions.pop();
+}
+
+export function logActivity(record: Omit<ActivityRecord, "id">) {
+  const id = `act_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  activityList.unshift({ ...record, id });
+  seenIps.add(record.ip);
+  if (activityList.length > 200) activityList.pop();
+}
+
+export function getAdminStats() {
+  const now = Date.now();
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayTimestamp = todayStart.getTime();
+
+  const totalGenerations = activityList.filter(a => a.type === "free_preview" || a.type === "pro_generation").length;
+  const todayGenerations = activityList.filter(a => a.timestamp >= todayTimestamp && (a.type === "free_preview" || a.type === "pro_generation")).length;
+  const totalUnlocks = transactions.length;
+  const todayUnlocks = transactions.filter(t => t.timestamp >= todayTimestamp).length;
+
+  let activeProCount = 0;
+  for (const [, pass] of proPassMap.entries()) {
+    if (now <= pass.expiresAt) activeProCount++;
+  }
+
+  return {
+    totalGenerations,
+    todayGenerations,
+    totalUnlocks,
+    todayUnlocks,
+    estimatedRevenue: totalUnlocks * 49,
+    todayRevenue: todayUnlocks * 49,
+    activeProPasses: activeProCount,
+    uniqueVisitors: seenIps.size,
+    recentTransactions: transactions.slice(0, 30),
+    recentActivity: activityList.slice(0, 30),
+  };
+}

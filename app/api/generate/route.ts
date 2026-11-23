@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { checkTierRateLimit, getClientIp } from "@/lib/rateLimiter";
+import { checkTierRateLimit, getClientIp, logActivity, logTransaction } from "@/lib/rateLimiter";
 import { KitData } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -318,6 +318,23 @@ ${jobDescription.trim()}`;
     }
     if (!Array.isArray(parsed.interviewQuestions) || parsed.interviewQuestions.length === 0) {
       throw new Error("Response was missing interviewQuestions array.");
+    }
+
+    logActivity({
+      timestamp: Date.now(),
+      type: rateCheck.isPro ? "pro_generation" : "free_preview",
+      ip: clientIp,
+      utr: proUtrHeader || undefined,
+    });
+
+    if (rateCheck.isPro && proUtrHeader) {
+      logTransaction({
+        utr: proUtrHeader,
+        timestamp: Date.now(),
+        ip: clientIp,
+        amount: 49,
+        status: "verified",
+      });
     }
 
     return NextResponse.json({
