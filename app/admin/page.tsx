@@ -147,7 +147,7 @@ export default function AdminPage() {
                 type="password"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="Enter secret PIN (e.g. 889900)"
+                placeholder="Enter secret 6-digit PIN"
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-brand-500 transition-colors text-center text-lg tracking-widest"
                 autoFocus
               />
@@ -479,7 +479,7 @@ export default function AdminPage() {
           <span>
             ⚡ Powered by Groq Cloud (`openai/gpt-oss-120b`) • Next.js 15.5.29 • Vercel Edge CDN
           </span>
-          <span>PIN Protection Active • Default PIN: `889900`</span>
+          <span>🔒 Private Admin Session Active</span>
         </div>
       </main>
     </div>

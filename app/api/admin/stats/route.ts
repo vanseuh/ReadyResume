@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const pinQuery = searchParams.get("pin");
   
-  const expectedPin = process.env.ADMIN_PIN || "889900";
+  const expectedPin = process.env.ADMIN_PIN || "260310";
   const providedPin = (pinHeader || pinQuery || "").trim();
 
   if (providedPin !== expectedPin) {
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const pinHeader = req.headers.get("x-admin-pin");
-  const expectedPin = process.env.ADMIN_PIN || "889900";
+  const expectedPin = process.env.ADMIN_PIN || "260310";
 
   if (pinHeader !== expectedPin) {
     return NextResponse.json(
