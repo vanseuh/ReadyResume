@@ -34,7 +34,7 @@ export default function PaymentModal({
   if (!isOpen) return null;
 
   // Environment variables with production-ready fallbacks
-  const upiId = process.env.NEXT_PUBLIC_UPI_ID || "yourname@okaxis";
+  const upiId = process.env.NEXT_PUBLIC_UPI_ID || "7599970805@fam";
   const merchantName = process.env.NEXT_PUBLIC_MERCHANT_NAME || "ReadyResume";
   const unlockPrice = process.env.NEXT_PUBLIC_UNLOCK_PRICE || "49";
 
