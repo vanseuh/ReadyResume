@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e40af" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <linearGradient id="goldSparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Background -->
+  <rect width="512" height="512" rx="128" fill="url(#rrGrad)" />
+
+  <!-- Inner subtle border -->
+  <rect x="12" y="12" width="488" height="488" rx="116" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="8" />
+
+  <!-- Document Silhouette -->
+  <g filter="url(#glow)">
+    <!-- Resume Paper Sheet -->
+    <path d="M144 96 C144 82 156 72 170 72 L304 72 L368 136 L368 416 C368 430 356 440 342 440 L170 440 C156 440 144 430 144 416 Z" fill="#ffffff" />
+    
+    <!-- Folded Corner -->
+    <path d="M304 72 L304 128 C304 132 308 136 312 136 L368 136 Z" fill="#cbd5e1" />
+    
+    <!-- Resume Content Lines -->
+    <!-- Name / Title Header Bar -->
+    <rect x="180" y="132" width="108" height="20" rx="10" fill="#2563eb" />
+    <rect x="180" y="164" width="76" height="12" rx="6" fill="#94a3b8" />
+    
+    <!-- Section Line 1 -->
+    <rect x="180" y="204" width="148" height="12" rx="6" fill="#cbd5e1" />
+    <rect x="180" y="228" width="128" height="12" rx="6" fill="#cbd5e1" />
+    <rect x="180" y="252" width="140" height="12" rx="6" fill="#cbd5e1" />
+
+    <!-- Section Line 2 -->
+    <rect x="180" y="288" width="148" height="12" rx="6" fill="#cbd5e1" />
+    <rect x="180" y="312" width="116" height="12" rx="6" fill="#cbd5e1" />
+    
+    <!-- Verified Badge / Checkmark Circle -->
+    <circle cx="330" cy="360" r="40" fill="#10b981" />
+    <path d="M315 360 L326 371 L347 349" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Prominent AI Sparkle Star (Top Right) -->
+  <path d="M380 50 Q380 90 420 90 Q380 90 380 130 Q380 90 340 90 Q380 90 380 50 Z" fill="url(#goldSparkle)" />
+  <circle cx="414" cy="44" r="8" fill="#fef08a" />
+</svg>

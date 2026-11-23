@@ -64,6 +64,16 @@ export const metadata: Metadata = {
       "Turn any job description into an ATS-optimized resume & STAR interview prep kit in 30 seconds. Instant ₹49 UPI Pro Pass.",
     creator: "@ReadyResume",
   },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: [
+      { url: "/apple-icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+  },
   robots: {
     index: true,
     follow: true,
