@@ -1,41 +1,47 @@
 /**
  * In-Memory Sliding Window IP Rate Limiter for Next.js App Router
- * Limits each IP address to at most 5 requests per hour.
+ * Limits each IP address to at most 3 requests per hour and 10 requests per day.
  */
 
 interface RateLimitRecord {
-  timestamps: number[];
+  hourlyTimestamps: number[];
+  dailyTimestamps: number[];
 }
 
 const rateLimitMap = new Map<string, RateLimitRecord>();
 
-const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const MAX_REQUESTS = 5;
+const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Automatic garbage collection every 10 minutes to avoid memory buildup
+const MAX_HOURLY = 3;
+const MAX_DAILY = 10;
+
+// Periodic cleanup every 15 minutes
 setInterval(() => {
   const now = Date.now();
   for (const [ip, record] of rateLimitMap.entries()) {
-    record.timestamps = record.timestamps.filter(t => now - t < WINDOW_MS);
-    if (record.timestamps.length === 0) {
+    record.hourlyTimestamps = record.hourlyTimestamps.filter(t => now - t < HOUR_MS);
+    record.dailyTimestamps = record.dailyTimestamps.filter(t => now - t < DAY_MS);
+    if (record.dailyTimestamps.length === 0) {
       rateLimitMap.delete(ip);
     }
   }
-}, 10 * 60 * 1000);
+}, 15 * 60 * 1000);
 
 export interface RateLimitResult {
   allowed: boolean;
-  remaining: number;
-  resetInMinutes: number;
+  remainingHourly: number;
+  remainingDaily: number;
+  message?: string;
 }
 
 export function checkRateLimit(ip: string): RateLimitResult {
-  // Allow unrestricted testing on localhost / local development so the admin/developer is never locked out
+  // Developer whitelist for localhost / local LAN testing
   if (ip === "127.0.0.1" || ip === "::1" || ip === "localhost" || ip.startsWith("192.168.")) {
     return {
       allowed: true,
-      remaining: 999,
-      resetInMinutes: 0,
+      remainingHourly: 999,
+      remainingDaily: 999,
     };
   }
 
@@ -43,37 +49,36 @@ export function checkRateLimit(ip: string): RateLimitResult {
   let record = rateLimitMap.get(ip);
 
   if (!record) {
-    record = { timestamps: [] };
+    record = { hourlyTimestamps: [], dailyTimestamps: [] };
     rateLimitMap.set(ip, record);
   }
 
-  // Filter timestamps within the current sliding 1-hour window
-  record.timestamps = record.timestamps.filter(t => now - t < WINDOW_MS);
+  // Filter within sliding windows
+  record.hourlyTimestamps = record.hourlyTimestamps.filter(t => now - t < HOUR_MS);
+  record.dailyTimestamps = record.dailyTimestamps.filter(t => now - t < DAY_MS);
 
-  if (record.timestamps.length >= MAX_REQUESTS) {
-    const oldest = record.timestamps[0];
-    const resetTime = oldest + WINDOW_MS;
-    const resetInMinutes = Math.max(1, Math.ceil((resetTime - now) / 60000));
-
+  // Check limits
+  if (record.hourlyTimestamps.length >= MAX_HOURLY || record.dailyTimestamps.length >= MAX_DAILY) {
     return {
       allowed: false,
-      remaining: 0,
-      resetInMinutes,
+      remainingHourly: Math.max(0, MAX_HOURLY - record.hourlyTimestamps.length),
+      remainingDaily: Math.max(0, MAX_DAILY - record.dailyTimestamps.length),
+      message: "You have reached the free preview limit. Please try again later.",
     };
   }
 
-  record.timestamps.push(now);
-  const remaining = MAX_REQUESTS - record.timestamps.length;
+  // Record request
+  record.hourlyTimestamps.push(now);
+  record.dailyTimestamps.push(now);
 
   return {
     allowed: true,
-    remaining,
-    resetInMinutes: 60,
+    remainingHourly: MAX_HOURLY - record.hourlyTimestamps.length,
+    remainingDaily: MAX_DAILY - record.dailyTimestamps.length,
   };
 }
 
 export function getClientIp(req: Request): string {
-  // Check standard proxy headers
   const forwarded = req.headers.get("x-forwarded-for");
   if (forwarded) {
     return forwarded.split(",")[0].trim();

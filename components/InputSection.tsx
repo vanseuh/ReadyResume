@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Loader2,
   Check,
+  Zap,
 } from "lucide-react";
 
 interface InputSectionProps {
@@ -20,6 +21,7 @@ interface InputSectionProps {
   onGenerate: () => void;
   isLoading: boolean;
   error: string | null;
+  cacheNotice?: string | null;
 }
 
 const DEMO_SAMPLES = {
@@ -117,8 +119,10 @@ Requirements:
   },
 };
 
-const MIN_CHARS = 50;
-const MAX_CHARS = 15000;
+export const MAX_RESUME_CHARS = 8000;
+export const MAX_JOB_CHARS = 5000;
+export const MIN_CHARS = 50;
+export const MIN_WORDS = 15;
 
 export default function InputSection({
   resume,
@@ -128,6 +132,7 @@ export default function InputSection({
   onGenerate,
   isLoading,
   error,
+  cacheNotice,
 }: InputSectionProps) {
   const [copiedResume, setCopiedResume] = useState(false);
   const [copiedJob, setCopiedJob] = useState(false);
@@ -135,9 +140,14 @@ export default function InputSection({
   const rLen = resume.trim().length;
   const jLen = jobDescription.trim().length;
 
-  const isResumeValid = rLen >= MIN_CHARS;
-  const isJobValid = jLen >= MIN_CHARS;
-  const isFormValid = isResumeValid && isJobValid && !isLoading;
+  const rWords = resume.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const jWords = jobDescription.trim().split(/\s+/).filter(w => w.length > 0).length;
+
+  const isResumeLengthValid = rLen >= MIN_CHARS && rLen <= MAX_RESUME_CHARS;
+  const isJobLengthValid = jLen >= MIN_CHARS && jLen <= MAX_JOB_CHARS;
+  const isWordsValid = rWords >= MIN_WORDS && jWords >= MIN_WORDS;
+
+  const isFormValid = isResumeLengthValid && isJobLengthValid && isWordsValid && !isLoading;
 
   const handlePasteResume = async () => {
     try {
@@ -187,7 +197,7 @@ export default function InputSection({
           in 30 Seconds.
         </h1>
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-          Check your ATS match score for free. Unlock your rewritten resume and 8 tailored interview
+          Check your ATS match score for free. Unlock your rewritten resume and 6 tailored interview
           Q&As for a one-time ₹49 payment—no subscriptions, no signup.
         </p>
 
@@ -197,21 +207,21 @@ export default function InputSection({
           <button
             type="button"
             onClick={() => handleLoadDemo("tech")}
-            className="px-3.5 py-1.5 rounded-full bg-white border border-slate-300 hover:border-brand-500 hover:text-brand-600 font-medium transition shadow-xs text-slate-700"
+            className="px-3.5 py-1.5 rounded-full bg-white border border-slate-300 hover:border-brand-500 hover:text-brand-600 font-medium transition shadow-xs text-slate-700 cursor-pointer"
           >
             💻 Full Stack / SDE-2
           </button>
           <button
             type="button"
             onClick={() => handleLoadDemo("pm")}
-            className="px-3.5 py-1.5 rounded-full bg-white border border-slate-300 hover:border-brand-500 hover:text-brand-600 font-medium transition shadow-xs text-slate-700"
+            className="px-3.5 py-1.5 rounded-full bg-white border border-slate-300 hover:border-brand-500 hover:text-brand-600 font-medium transition shadow-xs text-slate-700 cursor-pointer"
           >
             🚀 Product Manager
           </button>
           <button
             type="button"
             onClick={handleClear}
-            className="px-3 py-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+            className="px-3 py-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
           >
             Clear
           </button>
@@ -220,6 +230,19 @@ export default function InputSection({
 
       {/* INPUT CARD */}
       <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-5 sm:p-8 transition-all">
+        {/* Cache Hit Notification */}
+        {cacheNotice && (
+          <div className="mb-6 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 animate-fade-in flex items-center justify-between gap-3 text-xs">
+            <span className="flex items-center gap-2 font-medium">
+              <Zap className="w-4 h-4 text-emerald-600 shrink-0" />
+              {cacheNotice}
+            </span>
+            <span className="px-2 py-0.5 rounded-md bg-emerald-200/70 text-emerald-800 font-bold text-[10px]">
+              0 TOKENS USED
+            </span>
+          </div>
+        )}
+
         {/* Error Alert Display */}
         {error && (
           <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 animate-fade-in flex items-start gap-3">
@@ -246,12 +269,16 @@ export default function InputSection({
                 Paste Your Current Resume
               </label>
               <div className="flex items-center gap-2 text-xs">
-                {isResumeValid ? (
+                {rLen > MAX_RESUME_CHARS ? (
+                  <span className="text-[11px] text-rose-600 font-bold">
+                    Exceeds 8,000 char cap ({rLen}/8,000)
+                  </span>
+                ) : rLen >= MIN_CHARS ? (
                   <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                    <Check className="w-3 h-3" /> {rLen} chars
+                    <Check className="w-3 h-3" /> {rLen.toLocaleString()} / 8,000 chars
                   </span>
                 ) : (
-                  <span className="text-[11px] text-rose-500 font-semibold">
+                  <span className="text-[11px] text-slate-400">
                     {rLen} / {MIN_CHARS} chars min
                   </span>
                 )}
@@ -263,25 +290,32 @@ export default function InputSection({
                 id="resumeInput"
                 value={resume}
                 onChange={(e) => setResume(e.target.value)}
-                maxLength={MAX_CHARS}
+                maxLength={MAX_RESUME_CHARS + 500}
                 rows={12}
                 disabled={isLoading}
-                className="w-full h-72 sm:h-80 p-4 text-xs sm:text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition resize-none placeholder:text-slate-400 font-mono leading-relaxed"
+                className={`w-full h-72 sm:h-80 p-4 text-xs sm:text-sm text-slate-800 bg-slate-50 border rounded-2xl focus:bg-white focus:ring-2 transition resize-none placeholder:text-slate-400 font-mono leading-relaxed ${
+                  rLen > MAX_RESUME_CHARS
+                    ? "border-rose-400 focus:ring-rose-400"
+                    : "border-slate-200 focus:ring-brand-500 focus:border-brand-500"
+                }`}
                 placeholder="Paste your current resume content here (summary, work experience, bullet points, skills, education)..."
               />
               <button
                 type="button"
                 onClick={handlePasteResume}
-                className="absolute right-3 bottom-3 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-white/90 border border-slate-200 text-slate-600 hover:text-brand-600 hover:border-brand-400 transition shadow-xs backdrop-blur-xs"
+                className="absolute right-3 bottom-3 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-white/90 border border-slate-200 text-slate-600 hover:text-brand-600 hover:border-brand-400 transition shadow-xs backdrop-blur-xs cursor-pointer"
               >
                 <Clipboard className="w-3.5 h-3.5" />
                 <span>{copiedResume ? "Pasted!" : "Paste"}</span>
               </button>
             </div>
-            <p className="mt-2 text-xs text-slate-500 flex items-center gap-1.5">
-              <Info className="w-3.5 h-3.5 text-slate-400" />
-              Include metrics, past job titles, and skills for the most accurate scoring.
-            </p>
+            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+              <span className="flex items-center gap-1">
+                <Info className="w-3 h-3 text-slate-400" />
+                Max 8,000 chars (~1,200 words)
+              </span>
+              <span>{rWords} words</span>
+            </div>
           </div>
 
           {/* JOB DESCRIPTION INPUT */}
@@ -294,12 +328,16 @@ export default function InputSection({
                 Paste Target Job Description
               </label>
               <div className="flex items-center gap-2 text-xs">
-                {isJobValid ? (
+                {jLen > MAX_JOB_CHARS ? (
+                  <span className="text-[11px] text-rose-600 font-bold">
+                    Exceeds 5,000 char cap ({jLen}/5,000)
+                  </span>
+                ) : jLen >= MIN_CHARS ? (
                   <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                    <Check className="w-3 h-3" /> {jLen} chars
+                    <Check className="w-3 h-3" /> {jLen.toLocaleString()} / 5,000 chars
                   </span>
                 ) : (
-                  <span className="text-[11px] text-rose-500 font-semibold">
+                  <span className="text-[11px] text-slate-400">
                     {jLen} / {MIN_CHARS} chars min
                   </span>
                 )}
@@ -311,32 +349,49 @@ export default function InputSection({
                 id="jobInput"
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
-                maxLength={MAX_CHARS}
+                maxLength={MAX_JOB_CHARS + 500}
                 rows={12}
                 disabled={isLoading}
-                className="w-full h-72 sm:h-80 p-4 text-xs sm:text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition resize-none placeholder:text-slate-400 font-mono leading-relaxed"
+                className={`w-full h-72 sm:h-80 p-4 text-xs sm:text-sm text-slate-800 bg-slate-50 border rounded-2xl focus:bg-white focus:ring-2 transition resize-none placeholder:text-slate-400 font-mono leading-relaxed ${
+                  jLen > MAX_JOB_CHARS
+                    ? "border-rose-400 focus:ring-rose-400"
+                    : "border-slate-200 focus:ring-brand-500 focus:border-brand-500"
+                }`}
                 placeholder="Paste the target job posting (responsibilities, required qualifications, technical stack, nice-to-haves)..."
               />
               <button
                 type="button"
                 onClick={handlePasteJob}
-                className="absolute right-3 bottom-3 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-white/90 border border-slate-200 text-slate-600 hover:text-brand-600 hover:border-brand-400 transition shadow-xs backdrop-blur-xs"
+                className="absolute right-3 bottom-3 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-white/90 border border-slate-200 text-slate-600 hover:text-brand-600 hover:border-brand-400 transition shadow-xs backdrop-blur-xs cursor-pointer"
               >
                 <Clipboard className="w-3.5 h-3.5" />
                 <span>{copiedJob ? "Pasted!" : "Paste"}</span>
               </button>
             </div>
-            <p className="mt-2 text-xs text-slate-500 flex items-center gap-1.5">
-              <Target className="w-3.5 h-3.5 text-slate-400" />
-              Llama AI cross-references missing keywords and generates 8 custom STAR answers.
-            </p>
+            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+              <span className="flex items-center gap-1">
+                <Target className="w-3 h-3 text-slate-400" />
+                Max 5,000 chars (~800 words)
+              </span>
+              <span>{jWords} words</span>
+            </div>
           </div>
         </div>
 
         {/* Validation Warning & Submit Button */}
         <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs text-slate-500">
-            {!isResumeValid || !isJobValid ? (
+            {rLen > MAX_RESUME_CHARS || jLen > MAX_JOB_CHARS ? (
+              <span className="text-rose-600 font-medium flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
+                Input exceeds character cap. Please trim to proceed.
+              </span>
+            ) : !isWordsValid ? (
+              <span className="text-amber-700 font-medium flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                Both boxes require at least 15 words of genuine content.
+              </span>
+            ) : !isResumeLengthValid || !isJobLengthValid ? (
               <span className="text-rose-600 font-medium flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
                 Both boxes require at least 50 characters to run AI analysis.
@@ -344,7 +399,7 @@ export default function InputSection({
             ) : (
               <span className="text-emerald-700 font-medium flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                Inputs ready for analysis • Free instant preview
+                Inputs validated • 0-token duplicate cache active
               </span>
             )}
           </div>

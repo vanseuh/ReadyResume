@@ -34,7 +34,7 @@ export default function InterviewQuestions({
             Tailored Interview Questions & STAR Coaching
           </h3>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            8 custom questions (4 Technical & 4 Behavioral) tailored strictly to your resume and the target role.
+            6 custom questions (3 Technical & 3 Behavioral) tailored strictly to your resume and the target role.
           </p>
         </div>
 
@@ -44,11 +44,11 @@ export default function InterviewQuestions({
           </span>
           {isUnlocked ? (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-medium">
-              <Check className="w-3 h-3" /> All 8 Questions Unlocked
+              <Check className="w-3 h-3" /> All 6 Questions Unlocked
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-medium">
-              <Lock className="w-3 h-3" /> 6 Pro Questions (Locked)
+              <Lock className="w-3 h-3" /> 4 Pro Questions (Locked)
             </span>
           )}
         </div>
@@ -187,7 +187,7 @@ export default function InterviewQuestions({
               <Lock className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <h4 className="text-sm font-bold">Unlock all 8 tailored interview answers & STAR coaching</h4>
+              <h4 className="text-sm font-bold">Unlock all 6 tailored interview answers & STAR coaching</h4>
               <p className="text-xs text-brand-200">
                 Prepare for technical architecture, behavioral curveballs, and salary negotiation.
               </p>

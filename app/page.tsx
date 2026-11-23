@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import InputSection from "@/components/InputSection";
 import ScoreCard from "@/components/ScoreCard";
@@ -8,24 +8,75 @@ import InterviewQuestions from "@/components/InterviewQuestions";
 import TailoredResume from "@/components/TailoredResume";
 import PaymentModal from "@/components/PaymentModal";
 import { KitData, GenerateResponse } from "@/lib/types";
+import { computeInputHash, getCachedKit, saveCachedKit, validateInputQuality } from "@/lib/cacheUtils";
 
 export default function Home() {
   const [resume, setResume] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cacheNotice, setCacheNotice] = useState<string | null>(null);
   const [kitData, setKitData] = useState<KitData | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
+  // Restore session from localStorage on mount (0 tokens on refresh)
+  useEffect(() => {
+    try {
+      const savedSession = localStorage.getItem("readyresume_last_session");
+      if (savedSession) {
+        const parsed = JSON.parse(savedSession);
+        if (parsed.resume) setResume(parsed.resume);
+        if (parsed.jobDescription) setJobDescription(parsed.jobDescription);
+        if (parsed.kitData) {
+          setKitData(parsed.kitData);
+          setCacheNotice("Session restored from local storage (0 tokens used).");
+        }
+      }
+      if (localStorage.getItem("readyresume_unlocked") === "true") {
+        setIsUnlocked(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const handleGenerate = async () => {
-    if (resume.trim().length < 50 || jobDescription.trim().length < 50) {
-      setError("Please ensure both your Current Resume and Target Job Description have at least 50 characters.");
+    setError(null);
+    setCacheNotice(null);
+
+    // 1. Frontend Quality & Anti-Gibberish Validation (Min 15 words)
+    const quality = validateInputQuality(resume, jobDescription);
+    if (!quality.isValid) {
+      setError(quality.error || "Please provide valid inputs.");
       return;
     }
 
+    // 2. Client-Side Hash Caching: 0-Token Instant Hit
+    const inputHash = await computeInputHash(resume, jobDescription);
+    const cachedKit = getCachedKit(inputHash);
+
+    if (cachedKit) {
+      setKitData(cachedKit);
+      setCacheNotice("Exact match found in cache: Loaded instantly with 0 API tokens consumed!");
+      try {
+        localStorage.setItem(
+          "readyresume_last_session",
+          JSON.stringify({ resume, jobDescription, kitData: cachedKit })
+        );
+      } catch {}
+
+      setTimeout(() => {
+        const resultsEl = document.getElementById("resultsArea");
+        if (resultsEl) {
+          resultsEl.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 50);
+      return;
+    }
+
+    // 3. If cache miss, invoke server API
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch("/api/generate", {
@@ -44,6 +95,15 @@ export default function Home() {
       }
 
       setKitData(result.data);
+
+      // Save to client-side hash cache & active session
+      saveCachedKit(inputHash, result.data);
+      try {
+        localStorage.setItem(
+          "readyresume_last_session",
+          JSON.stringify({ resume, jobDescription, kitData: result.data })
+        );
+      } catch {}
 
       // Smooth scroll to results
       setTimeout(() => {
@@ -71,15 +131,23 @@ export default function Home() {
   const handleConfirmUnlock = () => {
     setIsUnlocked(true);
     setIsPaywallOpen(false);
+    try {
+      localStorage.setItem("readyresume_unlocked", "true");
+    } catch {}
   };
 
   const handleResetDemo = () => {
-    if (confirm("Reset demo session?")) {
+    if (confirm("Reset current session and clear cached form data?")) {
       setKitData(null);
       setIsUnlocked(false);
       setResume("");
       setJobDescription("");
       setError(null);
+      setCacheNotice(null);
+      try {
+        localStorage.removeItem("readyresume_last_session");
+        localStorage.removeItem("readyresume_unlocked");
+      } catch {}
     }
   };
 
@@ -100,6 +168,7 @@ export default function Home() {
           onGenerate={handleGenerate}
           isLoading={isLoading}
           error={error}
+          cacheNotice={cacheNotice}
         />
 
         {/* RESULTS STAGE (Rendered once generated) */}
@@ -113,7 +182,7 @@ export default function Home() {
               isUnlocked={isUnlocked}
             />
 
-            {/* 8 Tailored Interview Questions (Q1 & Q2 Free, Q3-Q8 Locked behind ₹49) */}
+            {/* 6 Tailored Interview Questions (Q1 & Q2 Free, Q3-Q6 Locked behind ₹49) */}
             <InterviewQuestions
               questions={kitData.interviewQuestions}
               isUnlocked={isUnlocked}
@@ -141,11 +210,11 @@ export default function Home() {
             <span>• Self-Service ATS Career Kit</span>
           </div>
           <div className="flex items-center gap-4 text-slate-500">
-            <span>Server-side Llama 3.3 AI</span>
+            <span>Server-side Llama AI</span>
             <span>•</span>
             <span>Zero Visitor Keys Required</span>
             <span>•</span>
-            <button onClick={handleResetDemo} className="text-brand-600 hover:underline">
+            <button onClick={handleResetDemo} className="text-brand-600 hover:underline cursor-pointer">
               Reset Session
             </button>
           </div>

@@ -3,13 +3,48 @@ import OpenAI from "openai";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 import { KitData } from "@/lib/types";
 
-// Character limits per input box
-const MAX_CHARACTERS = 15000;
+// Token-Conservation Constraints
+const MAX_RESUME_CHARS = 8000;     // ~1,200 words / 2–3 pages
+const MAX_JOB_CHARS = 5000;        // ~800 words
 const MIN_CHARACTERS = 50;
+const MIN_WORDS = 15;
+
+// Cumulative token usage tracking across server invocations
+let cumulativeTokensUsed = 0;
+const TOTAL_TOKEN_BUDGET = 40_000_000;
+
+function isGibberishOrSpam(text: string): { isSpam: boolean; reason?: string } {
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+  if (words.length < MIN_WORDS) {
+    return {
+      isSpam: true,
+      reason: `Text is too sparse (found ${words.length} words; minimum ${MIN_WORDS} words required for accurate analysis).`,
+    };
+  }
+
+  // Check for repeated identical characters (e.g., 'aaaa...', 'xxxx...')
+  if (/(.)\1{12,}/.test(text)) {
+    return {
+      isSpam: true,
+      reason: "Input contains excessive repeated characters.",
+    };
+  }
+
+  // Check for repeated short dummy words (e.g., 'test test test test')
+  const uniqueWords = new Set(words.map(w => w.toLowerCase()));
+  if (words.length >= 20 && uniqueWords.size / words.length < 0.25) {
+    return {
+      isSpam: true,
+      reason: "Input lacks sufficient variety or consists of repetitive placeholder text.",
+    };
+  }
+
+  return { isSpam: false };
+}
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. In-Memory IP Rate Limiting (5 requests per IP per hour to protect tokens)
+    // 1. In-Memory IP Rate Limiting (3/hr and 10/day to conserve 40M budget)
     const clientIp = getClientIp(req);
     const rateCheck = checkRateLimit(clientIp);
 
@@ -17,13 +52,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Hourly rate limit exceeded. To protect server capacity, you may make up to 5 generations per hour. Please try again in ${rateCheck.resetInMinutes} minute(s).`,
+          error: rateCheck.message || "You have reached the free preview limit. Please try again later.",
         },
         { status: 429 }
       );
     }
 
-    // 2. Parse & Validate Inputs
+    // 2. Parse Request Payload
     let body;
     try {
       body = await req.json();
@@ -36,11 +71,12 @@ export async function POST(req: NextRequest) {
 
     const { resume, jobDescription } = body || {};
 
+    // Basic Character Length Checks
     if (!resume || typeof resume !== "string" || resume.trim().length < MIN_CHARACTERS) {
       return NextResponse.json(
         {
           success: false,
-          error: `Current Resume is too short. Please provide at least ${MIN_CHARACTERS} characters (experience, job history, skills).`,
+          error: `Current Resume is too short. Please provide at least ${MIN_CHARACTERS} characters.`,
         },
         { status: 400 }
       );
@@ -50,33 +86,50 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Target Job Description is too short. Please provide at least ${MIN_CHARACTERS} characters (role requirements, responsibilities).`,
+          error: `Target Job Description is too short. Please provide at least ${MIN_CHARACTERS} characters.`,
         },
         { status: 400 }
       );
     }
 
-    if (resume.length > MAX_CHARACTERS) {
+    if (resume.length > MAX_RESUME_CHARS) {
       return NextResponse.json(
         {
           success: false,
-          error: `Resume exceeds the maximum allowable length of ${MAX_CHARACTERS} characters.`,
+          error: `Resume exceeds the maximum allowable cap of ${MAX_RESUME_CHARS.toLocaleString()} characters.`,
         },
         { status: 400 }
       );
     }
 
-    if (jobDescription.length > MAX_CHARACTERS) {
+    if (jobDescription.length > MAX_JOB_CHARS) {
       return NextResponse.json(
         {
           success: false,
-          error: `Job Description exceeds the maximum allowable length of ${MAX_CHARACTERS} characters.`,
+          error: `Job Description exceeds the maximum allowable cap of ${MAX_JOB_CHARS.toLocaleString()} characters.`,
         },
         { status: 400 }
       );
     }
 
-    // 3. Verify Server LLM / Llama API Configuration
+    // Gibberish & Empty Input Filter
+    const resumeSpamCheck = isGibberishOrSpam(resume);
+    if (resumeSpamCheck.isSpam) {
+      return NextResponse.json(
+        { success: false, error: `Resume Error: ${resumeSpamCheck.reason}` },
+        { status: 400 }
+      );
+    }
+
+    const jobSpamCheck = isGibberishOrSpam(jobDescription);
+    if (jobSpamCheck.isSpam) {
+      return NextResponse.json(
+        { success: false, error: `Job Description Error: ${jobSpamCheck.reason}` },
+        { status: 400 }
+      );
+    }
+
+    // 3. Verify Server LLM Configuration
     const apiKey = (process.env.LLM_API_KEY || process.env.LLAMA_API_KEY)?.trim();
     const baseURL = (process.env.LLM_BASE_URL || process.env.LLAMA_BASE_URL)?.trim() || "https://api.groq.com/openai/v1";
     const model = (process.env.LLM_MODEL || process.env.LLAMA_MODEL)?.trim() || "llama-3.3-70b-versatile";
@@ -92,77 +145,71 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Construct System Prompt & JSON Instructions
-    const systemPrompt = `You are an expert Executive Career Coach and Senior ATS (Applicant Tracking System) Specialist.
-Analyze the provided candidate resume against the target job description and generate an ATS Career Kit.
+    // 4. Ultra-Concise, Token-Optimized System Prompt (Zero Fluff)
+    const systemPrompt = `You are a Senior ATS Career Specialist. Output concise, punchy, high-impact career assets.
+Be direct. Avoid conversational filler.
 
 OUTPUT INSTRUCTIONS:
-You MUST respond with valid, parseable JSON only matching this exact schema:
+Respond with parseable JSON matching this schema:
 {
-  "atsScore": 76,
+  "atsScore": 75,
   "scoreCategory": "Strong Contender",
-  "missingKeywords": [
-    "Keyword 1",
-    "Keyword 2",
-    "Keyword 3",
-    "Keyword 4"
-  ],
+  "missingKeywords": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],
   "tailoredResume": {
-    "fullName": "Candidate Full Name from resume",
-    "targetTitle": "Target Title from job description",
-    "contact": "Email | Phone | Location | Links from resume",
-    "summary": "Compelling 3-4 sentence professional summary tailored to target role.",
+    "fullName": "Name from resume",
+    "targetTitle": "Target role title",
+    "contact": "Contact line",
+    "summary": "Crisp 2-3 sentence tailored summary.",
     "skills": {
-      "technical": "Comma separated technical skills and tools",
-      "methodologies": "Comma separated methodologies and workflows",
-      "leadership": "Comma separated soft skills and collaboration traits"
+      "technical": "Key technical skills",
+      "methodologies": "Key methodologies",
+      "leadership": "Key collaboration skills"
     },
     "experience": [
       {
-        "role": "Role Title",
-        "company": "Company Name",
-        "period": "Date Range",
+        "role": "Role",
+        "company": "Company",
+        "period": "Dates",
         "bullets": [
-          "Action-oriented bullet 1 with quantifiable metrics and keywords",
-          "Action-oriented bullet 2 with quantifiable metrics and keywords",
-          "Action-oriented bullet 3 with quantifiable metrics and keywords"
+          "Action-oriented bullet with metric",
+          "Action-oriented bullet with metric"
         ]
       }
     ],
-    "education": "Degree, Major, Institution from resume"
+    "education": "Degree and institution"
   },
   "interviewQuestions": [
     {
       "id": 1,
-      "category": "Technical Architecture",
+      "category": "Domain",
       "type": "technical",
-      "question": "Role-specific technical question tailored to candidate and job?",
-      "criteria": "Interviewer evaluation criteria",
+      "question": "Concise role-specific question?",
+      "criteria": "Evaluation criteria",
       "sampleAnswer": {
-        "situation": "Specific past scenario...",
-        "task": "The technical obstacle or problem...",
-        "action": "Actions taken with relevant tools...",
-        "result": "Measurable outcome achieved..."
+        "situation": "Crisp 1-sentence situation.",
+        "task": "Crisp 1-sentence task.",
+        "action": "Crisp 1-2 sentence action taken.",
+        "result": "Measurable quantifiable result."
       },
-      "proTip": "Expert pro tip"
+      "proTip": "Punchy 1-sentence tip"
     }
   ]
 }
 
-STRICT EVALUATION CONSTRAINTS:
-1. Realistically evaluate keyword overlap: score 20–45 if mostly mismatched, 50–70 if partial match with gaps, 75–92 if strong.
-2. Identify 3 to 5 genuinely missing or under-represented keywords/technologies from the job description.
-3. Tailor resume strictly to provided facts without inventing fake companies or degrees.
-4. Provide exactly 8 interview questions (ids 1 to 8: exactly 4 technical and 4 behavioral) with multi-sentence STAR answers.
-5. Return JSON ONLY. Do not wrap in markdown or include conversational intro/outro text.`;
+STRICT CONSTRAINTS:
+1. ATS Score (0-100%): Realistic score based on skill overlap.
+2. missingKeywords: Exactly 3 to 5 top critical missing keywords from job description.
+3. tailoredResume: Keep bullets punchy, direct, and metric-focused without fluff.
+4. interviewQuestions: Provide exactly 6 questions (IDs 1 to 6: exactly 3 technical + 3 behavioral) with crisp 3-4 sentence total STAR answers.
+5. Return JSON ONLY. No markdown wrapper, no preamble.`;
 
-    const userPrompt = `CANDIDATE RESUME:
+    const userPrompt = `RESUME:
 ${resume.trim()}
 
-TARGET JOB DESCRIPTION:
+JOB DESCRIPTION:
 ${jobDescription.trim()}`;
 
-    // 5. Query Llama via OpenAI-compatible endpoint
+    // 5. Query LLM with strict max_tokens cap
     const openai = new OpenAI({
       apiKey,
       baseURL,
@@ -178,9 +225,9 @@ ${jobDescription.trim()}`;
         ],
         response_format: { type: "json_object" },
         temperature: 0.2,
+        max_tokens: 1800, // Capped to conserve token budget
       });
     } catch (apiErr: unknown) {
-      // Some providers/models may not support response_format: { type: "json_object" }
       const err = apiErr as Error;
       if (/response_format|json_object|unsupported/i.test(err.message)) {
         console.warn("Retrying without response_format json_object...");
@@ -191,18 +238,35 @@ ${jobDescription.trim()}`;
             { role: "user", content: userPrompt },
           ],
           temperature: 0.2,
+          max_tokens: 1800,
         });
       } else {
         throw apiErr;
       }
     }
 
-    const rawText = completion.choices[0]?.message?.content;
-    if (!rawText) {
-      throw new Error("Llama API returned an empty response.");
+    // 6. Live Token Usage Tracker (Server Console Logs)
+    const usage = completion.usage;
+    if (usage) {
+      cumulativeTokensUsed += usage.total_tokens;
+      const remainingBudget = Math.max(0, TOTAL_TOKEN_BUDGET - cumulativeTokensUsed);
+      const percentUsed = ((cumulativeTokensUsed / TOTAL_TOKEN_BUDGET) * 100).toFixed(4);
+      const percentRemaining = (100 - parseFloat(percentUsed)).toFixed(4);
+
+      console.log(`\n======================================================`);
+      console.log(`📊 [ReadyResume Live Token Tracker]`);
+      console.log(`Request Usage: Prompt=${usage.prompt_tokens} | Completion=${usage.completion_tokens} | Total=${usage.total_tokens}`);
+      console.log(`Session Cumulative: ${cumulativeTokensUsed.toLocaleString()} tokens (${percentUsed}% of 40M)`);
+      console.log(`Budget Remaining: ${remainingBudget.toLocaleString()} / ${TOTAL_TOKEN_BUDGET.toLocaleString()} tokens (${percentRemaining}%)`);
+      console.log(`======================================================\n`);
     }
 
-    // 6. Safe JSON Extraction
+    const rawText = completion.choices[0]?.message?.content;
+    if (!rawText) {
+      throw new Error("LLM API returned an empty response.");
+    }
+
+    // 7. Safe JSON Extraction
     let cleaned = rawText.trim();
     cleaned = cleaned.replace(/^```json\s*/i, "").replace(/^```\s*/, "").replace(/```$/g, "").trim();
 
@@ -231,6 +295,13 @@ ${jobDescription.trim()}`;
     return NextResponse.json({
       success: true,
       data: parsed,
+      tokenUsage: usage
+        ? {
+            promptTokens: usage.prompt_tokens,
+            completionTokens: usage.completion_tokens,
+            totalTokens: usage.total_tokens,
+          }
+        : undefined,
     });
   } catch (err: unknown) {
     const error = err as Error;
@@ -238,7 +309,7 @@ ${jobDescription.trim()}`;
 
     const isRateLimit = /rate limit|429|quota/i.test(error.message);
     const friendlyMessage = isRateLimit
-      ? "Llama API rate limit reached. Please wait a moment and try again."
+      ? "LLM API rate limit reached. Please wait a moment and try again."
       : error.message || "An error occurred while generating your career kit.";
 
     return NextResponse.json(

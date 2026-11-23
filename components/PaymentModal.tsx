@@ -144,7 +144,7 @@ export default function PaymentModal({
           </div>
           <h3 className="text-xl sm:text-2xl font-black tracking-tight">Unlock ReadyResume Pro Kit</h3>
           <p className="text-xs text-brand-200 mt-1 max-w-xs mx-auto">
-            Full rewritten resume, all 8 STAR answers & high-resolution PDF kit.
+            Full rewritten resume, all 6 STAR answers & high-resolution PDF kit.
           </p>
         </div>
 
@@ -273,7 +273,7 @@ export default function PaymentModal({
             </button>
 
             <p className="text-center text-[10px] text-slate-400 leading-tight">
-              Instant automatic verification. Once verified, all 8 questions, full rewritten resume,
+              Instant automatic verification. Once verified, all 6 questions, full rewritten resume,
               and PDF export unlock permanently for this session.
             </p>
           </div>

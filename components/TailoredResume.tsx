@@ -120,7 +120,7 @@ export default function TailoredResume({
                 Unlock Your Complete Tailored Resume & PDF
               </h4>
               <p className="text-xs text-slate-600 mb-5 leading-relaxed">
-                Get full access to the rewritten ATS-compliant resume with integrated keywords, all 8 STAR
+                Get full access to the rewritten ATS-compliant resume with integrated keywords, all 6 STAR
                 interview answers, and unlimited multi-page PDF downloads.
               </p>
 
@@ -131,7 +131,7 @@ export default function TailoredResume({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>All 8 behavioral & technical STAR answers</span>
+                  <span>All 6 behavioral & technical STAR answers</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />

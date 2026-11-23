@@ -181,7 +181,7 @@ export function generatePdfKit(data: KitData) {
     cursorY + 13
   );
   doc.text(
-    "Structured STAR answers (Situation, Task, Action, Result) for 4 Technical & 4 Behavioral Questions.",
+    "Structured STAR answers (Situation, Task, Action, Result) for 3 Technical & 3 Behavioral Questions.",
     margin + 4,
     cursorY + 18
   );
