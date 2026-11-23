@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
+import { checkTierRateLimit, getClientIp } from "@/lib/rateLimiter";
 import { KitData } from "@/lib/types";
 
 // Token-Conservation Constraints
@@ -44,15 +44,24 @@ function isGibberishOrSpam(text: string): { isSpam: boolean; reason?: string } {
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. In-Memory IP Rate Limiting (3/hr and 10/day to conserve 40M budget)
+    // 1. Dual-Tier Rate Limiting (Free: 3/hr | 10-Day Pro Pass: 10/day)
     const clientIp = getClientIp(req);
-    const rateCheck = checkRateLimit(clientIp);
+    const proUtrHeader = req.headers.get("x-pro-utr");
+    const rateCheck = checkTierRateLimit(clientIp, proUtrHeader);
 
     if (!rateCheck.allowed) {
       return NextResponse.json(
         {
           success: false,
-          error: rateCheck.message || "You have reached the free preview limit. Please try again later.",
+          error: rateCheck.message || "You have reached the preview limit. Please try again later.",
+          proPass: rateCheck.isPro
+            ? {
+                isPro: true,
+                remainingToday: rateCheck.remainingToday || 0,
+                expiresAt: rateCheck.expiresAt || 0,
+                dayNumber: rateCheck.dayNumber || 1,
+              }
+            : undefined,
         },
         { status: 429 }
       );
@@ -225,7 +234,7 @@ ${jobDescription.trim()}`;
         ],
         response_format: { type: "json_object" },
         temperature: 0.2,
-        max_tokens: 1800, // Capped to conserve token budget
+        max_tokens: 2400, // Capped to conserve token budget while preventing JSON truncation
       });
     } catch (apiErr: unknown) {
       const err = apiErr as Error;
@@ -238,7 +247,7 @@ ${jobDescription.trim()}`;
             { role: "user", content: userPrompt },
           ],
           temperature: 0.2,
-          max_tokens: 1800,
+          max_tokens: 2400,
         });
       } else {
         throw apiErr;
@@ -295,6 +304,14 @@ ${jobDescription.trim()}`;
     return NextResponse.json({
       success: true,
       data: parsed,
+      proPass: rateCheck.isPro
+        ? {
+            isPro: true,
+            remainingToday: rateCheck.remainingToday ?? 10,
+            expiresAt: rateCheck.expiresAt || 0,
+            dayNumber: rateCheck.dayNumber || 1,
+          }
+        : undefined,
       tokenUsage: usage
         ? {
             promptTokens: usage.prompt_tokens,

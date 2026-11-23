@@ -3,7 +3,7 @@
  * Guarantees 0-token duplicate execution when users submit identical inputs or reload the page.
  */
 
-import { KitData } from "./types";
+import { KitData, ProPassData } from "./types";
 
 /**
  * Fast SHA-256 hash string for browser inputs
@@ -98,4 +98,89 @@ export function validateInputQuality(resume: string, jobDescription: string): { 
   }
 
   return { isValid: true };
+}
+
+// ==========================================
+// 10-DAY PRO PASS SYSTEM (10 generations/day)
+// ==========================================
+
+export const PRO_PASS_DURATION_MS = 10 * 24 * 60 * 60 * 1000; // 10 days
+export const PRO_DAILY_LIMIT = 10;
+const PRO_PASS_KEY = "readyresume_pro_pass";
+
+export function activateProPass(utr: string): ProPassData {
+  const now = Date.now();
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const pass: ProPassData = {
+    utr: utr.trim(),
+    activatedAt: now,
+    expiresAt: now + PRO_PASS_DURATION_MS,
+    dailyUsage: {
+      date: todayKey,
+      count: 0,
+    },
+  };
+
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(PRO_PASS_KEY, JSON.stringify(pass));
+      localStorage.setItem("readyresume_unlocked", "true");
+    } catch {}
+  }
+  return pass;
+}
+
+export function getActiveProPass(): ProPassData | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(PRO_PASS_KEY);
+    if (!raw) return null;
+    const pass = JSON.parse(raw) as ProPassData;
+    const now = Date.now();
+
+    // Check 10-day expiration
+    if (now > pass.expiresAt) {
+      localStorage.removeItem(PRO_PASS_KEY);
+      localStorage.removeItem("readyresume_unlocked");
+      return null;
+    }
+
+    // Rollover new day if date has changed
+    const todayKey = new Date().toISOString().slice(0, 10);
+    if (!pass.dailyUsage || pass.dailyUsage.date !== todayKey) {
+      pass.dailyUsage = { date: todayKey, count: 0 };
+      localStorage.setItem(PRO_PASS_KEY, JSON.stringify(pass));
+    }
+
+    return pass;
+  } catch {
+    return null;
+  }
+}
+
+export function incrementProUsage(): ProPassData | null {
+  const pass = getActiveProPass();
+  if (!pass) return null;
+  const todayKey = new Date().toISOString().slice(0, 10);
+  if (pass.dailyUsage.date === todayKey) {
+    pass.dailyUsage.count = Math.min(PRO_DAILY_LIMIT, pass.dailyUsage.count + 1);
+  } else {
+    pass.dailyUsage = { date: todayKey, count: 1 };
+  }
+  try {
+    localStorage.setItem(PRO_PASS_KEY, JSON.stringify(pass));
+  } catch {}
+  return pass;
+}
+
+export function formatExpiryDate(timestamp: number): string {
+  try {
+    return new Date(timestamp).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return "10 days";
+  }
 }

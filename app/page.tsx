@@ -7,8 +7,18 @@ import ScoreCard from "@/components/ScoreCard";
 import InterviewQuestions from "@/components/InterviewQuestions";
 import TailoredResume from "@/components/TailoredResume";
 import PaymentModal from "@/components/PaymentModal";
-import { KitData, GenerateResponse } from "@/lib/types";
-import { computeInputHash, getCachedKit, saveCachedKit, validateInputQuality } from "@/lib/cacheUtils";
+import { KitData, GenerateResponse, ProPassData } from "@/lib/types";
+import {
+  computeInputHash,
+  getCachedKit,
+  saveCachedKit,
+  validateInputQuality,
+  getActiveProPass,
+  activateProPass,
+  incrementProUsage,
+  formatExpiryDate,
+} from "@/lib/cacheUtils";
+import { AlertCircle } from "lucide-react";
 
 export default function Home() {
   const [resume, setResume] = useState("");
@@ -17,12 +27,23 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [cacheNotice, setCacheNotice] = useState<string | null>(null);
   const [kitData, setKitData] = useState<KitData | null>(null);
+  const [proPass, setProPass] = useState<ProPassData | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
-  // Restore session from localStorage on mount (0 tokens on refresh)
+  // Restore 10-Day Pro Pass and Session from localStorage on mount (0 tokens)
   useEffect(() => {
     try {
+      // 1. Check active Pro Pass
+      const activePass = getActiveProPass();
+      if (activePass) {
+        setProPass(activePass);
+        setIsUnlocked(true);
+      } else if (localStorage.getItem("readyresume_unlocked") === "true") {
+        setIsUnlocked(true);
+      }
+
+      // 2. Check saved session
       const savedSession = localStorage.getItem("readyresume_last_session");
       if (savedSession) {
         const parsed = JSON.parse(savedSession);
@@ -33,9 +54,6 @@ export default function Home() {
           setCacheNotice("Session restored from local storage (0 tokens used).");
         }
       }
-      if (localStorage.getItem("readyresume_unlocked") === "true") {
-        setIsUnlocked(true);
-      }
     } catch {
       // ignore
     }
@@ -45,14 +63,28 @@ export default function Home() {
     setError(null);
     setCacheNotice(null);
 
-    // 1. Frontend Quality & Anti-Gibberish Validation (Min 15 words)
+    // 1. Enforce Daily 10/day Pro Pass Cap if active
+    if (proPass) {
+      const todayKey = new Date().toISOString().slice(0, 10);
+      const todayCount = proPass.dailyUsage?.date === todayKey ? proPass.dailyUsage.count : 0;
+      if (todayCount >= 10) {
+        const elapsedMs = Math.max(0, Date.now() - proPass.activatedAt);
+        const dayNumber = Math.min(10, Math.floor(elapsedMs / (24 * 60 * 60 * 1000)) + 1);
+        setError(
+          `You've used all 10 Pro generations for today! Your daily limit resets tomorrow (Day ${dayNumber} of 10).`
+        );
+        return;
+      }
+    }
+
+    // 2. Frontend Quality & Anti-Gibberish Validation (Min 15 words)
     const quality = validateInputQuality(resume, jobDescription);
     if (!quality.isValid) {
       setError(quality.error || "Please provide valid inputs.");
       return;
     }
 
-    // 2. Client-Side Hash Caching: 0-Token Instant Hit
+    // 3. Client-Side Hash Caching: 0-Token Instant Hit
     const inputHash = await computeInputHash(resume, jobDescription);
     const cachedKit = getCachedKit(inputHash);
 
@@ -75,13 +107,21 @@ export default function Home() {
       return;
     }
 
-    // 3. If cache miss, invoke server API
+    // 4. Invoke server API with x-pro-utr header if Pro user
     setIsLoading(true);
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (proPass?.utr) {
+        headers["x-pro-utr"] = proPass.utr;
+      }
+
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           resume: resume.trim(),
           jobDescription: jobDescription.trim(),
@@ -95,6 +135,14 @@ export default function Home() {
       }
 
       setKitData(result.data);
+
+      // Increment Pro Pass daily usage if active
+      if (proPass) {
+        const updatedPass = incrementProUsage();
+        if (updatedPass) {
+          setProPass({ ...updatedPass });
+        }
+      }
 
       // Save to client-side hash cache & active session
       saveCachedKit(inputHash, result.data);
@@ -128,18 +176,18 @@ export default function Home() {
     }
   };
 
-  const handleConfirmUnlock = () => {
+  const handleConfirmUnlock = (utr: string) => {
+    const newPass = activateProPass(utr);
+    setProPass(newPass);
     setIsUnlocked(true);
     setIsPaywallOpen(false);
-    try {
-      localStorage.setItem("readyresume_unlocked", "true");
-    } catch {}
   };
 
   const handleResetDemo = () => {
     if (confirm("Reset current session and clear cached form data?")) {
       setKitData(null);
       setIsUnlocked(false);
+      setProPass(null);
       setResume("");
       setJobDescription("");
       setError(null);
@@ -147,18 +195,40 @@ export default function Home() {
       try {
         localStorage.removeItem("readyresume_last_session");
         localStorage.removeItem("readyresume_unlocked");
+        localStorage.removeItem("readyresume_pro_pass");
       } catch {}
     }
   };
+
+  const remainingToday = proPass
+    ? Math.max(0, 10 - (proPass.dailyUsage?.count || 0))
+    : 0;
 
   return (
     <>
       <Header
         isUnlocked={isUnlocked}
+        proPass={proPass}
         onOpenPaywall={() => setIsPaywallOpen(true)}
       />
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Pro Daily Cap Warning Banner */}
+        {proPass && remainingToday === 0 && (
+          <div className="mb-8 p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 flex items-center justify-between gap-3 animate-fade-in text-xs sm:text-sm">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+              <span>
+                <strong>Daily Limit Reached:</strong> You&apos;ve used all 10 Pro generations for today!
+                Your daily quota resets tomorrow.
+              </span>
+            </div>
+            <span className="font-semibold text-amber-800 shrink-0 text-xs">
+              Expires on {formatExpiryDate(proPass.expiresAt)}
+            </span>
+          </div>
+        )}
+
         {/* INPUT STAGE */}
         <InputSection
           resume={resume}
@@ -207,7 +277,7 @@ export default function Home() {
               R
             </div>
             <span className="font-bold text-slate-800">ReadyResume</span>
-            <span>• Self-Service ATS Career Kit</span>
+            <span>• Self-Service ATS Career Kit & 10-Day Pro Pass</span>
           </div>
           <div className="flex items-center gap-4 text-slate-500">
             <span>Server-side Llama AI</span>

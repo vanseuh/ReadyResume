@@ -49,8 +49,24 @@ export interface GenerateRequest {
   jobDescription: string;
 }
 
+export interface ProPassData {
+  utr: string;
+  activatedAt: number;
+  expiresAt: number;
+  dailyUsage: {
+    date: string; // YYYY-MM-DD
+    count: number; // 0 to 10
+  };
+}
+
 export interface GenerateResponse {
   success: boolean;
   data?: KitData;
   error?: string;
+  proPass?: {
+    isPro: boolean;
+    remainingToday: number;
+    expiresAt: number;
+    dayNumber: number;
+  };
 }

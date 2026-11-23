@@ -117,11 +117,10 @@ export default function TailoredResume({
                 🔒 Premium Kit Locked
               </span>
               <h4 className="text-lg font-bold text-slate-900 mb-2">
-                Unlock Your Complete Tailored Resume & PDF
+                Unlock Full Kit + 10-Day Pro Pass
               </h4>
               <p className="text-xs text-slate-600 mb-5 leading-relaxed">
-                Get full access to the rewritten ATS-compliant resume with integrated keywords, all 6 STAR
-                interview answers, and unlimited multi-page PDF downloads.
+                Unlock Full Kit + 10-Day Pro Pass (10 Tailored Resumes/Day) — ₹49 One-Time. Includes all 6 STAR interview answers and multi-page printable PDF export.
               </p>
 
               <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 mb-5 text-left text-xs space-y-2 text-slate-700">
@@ -135,6 +134,10 @@ export default function TailoredResume({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>10-Day Pro Pass (10 tailored resumes / day)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Multi-page printable PDF Career Kit export</span>
                 </div>
               </div>
@@ -143,7 +146,7 @@ export default function TailoredResume({
                 onClick={onOpenPaywall}
                 className="w-full py-3.5 px-6 rounded-xl font-bold text-white bg-gradient-to-r from-brand-600 via-indigo-600 to-brand-700 hover:from-brand-700 hover:to-indigo-800 transition shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 text-sm cursor-pointer"
               >
-                <span>Unlock Everything for ₹49</span>
+                <span>Unlock Full Kit + 10-Day Pro Pass (₹49)</span>
                 <Sparkles className="w-4 h-4" />
               </button>
 

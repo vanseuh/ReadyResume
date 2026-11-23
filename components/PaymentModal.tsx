@@ -9,8 +9,8 @@ import {
   Smartphone,
   AlertCircle,
   ExternalLink,
-  Lock,
   Sparkles,
+  Calendar,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import confetti from "canvas-confetti";
@@ -18,7 +18,7 @@ import confetti from "canvas-confetti";
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirmUnlock: () => void;
+  onConfirmUnlock: (utr: string) => void;
 }
 
 export default function PaymentModal({
@@ -34,24 +34,24 @@ export default function PaymentModal({
   if (!isOpen) return null;
 
   // Environment variables with production-ready fallbacks
-  const upiId = process.env.NEXT_PUBLIC_UPI_ID || "7599970805@fam";
+  const upiId = process.env.NEXT_PUBLIC_UPI_ID || "yourname@okaxis";
   const merchantName = process.env.NEXT_PUBLIC_MERCHANT_NAME || "ReadyResume";
   const unlockPrice = process.env.NEXT_PUBLIC_UNLOCK_PRICE || "49";
 
   // Standard NPCI UPI Intent URI
   const upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
     merchantName
-  )}&am=${unlockPrice}&cu=INR&tn=${encodeURIComponent("ReadyResume Full Kit")}`;
+  )}&am=${unlockPrice}&cu=INR&tn=${encodeURIComponent("ReadyResume 10-Day Pro Pass")}`;
 
   const triggerCelebration = () => {
     try {
       confetti({
-        particleCount: 100,
-        spread: 70,
+        particleCount: 120,
+        spread: 75,
         origin: { y: 0.6 },
       });
     } catch {
-      // ignore in environments where canvas is unavailable
+      // ignore
     }
   };
 
@@ -88,7 +88,7 @@ export default function PaymentModal({
       return;
     }
 
-    // 3. Prevent reuse of identical UTRs in local storage
+    // 3. Prevent duplicate reuse across sessions
     try {
       const stored = localStorage.getItem("readyresume_used_utrs");
       const usedUtrs: string[] = stored ? JSON.parse(stored) : [];
@@ -100,22 +100,21 @@ export default function PaymentModal({
 
       usedUtrs.push(cleanUtr);
       localStorage.setItem("readyresume_used_utrs", JSON.stringify(usedUtrs));
-      localStorage.setItem("readyresume_unlocked", "true");
     } catch {
-      // localStorage may fail in restricted/private modes
+      // ignore
     }
 
     setIsVerifying(true);
     setTimeout(() => {
       setIsVerifying(false);
       triggerCelebration();
-      onConfirmUnlock();
+      onConfirmUnlock(cleanUtr);
     }, 800);
   };
 
   const handleDevUnlock = () => {
     triggerCelebration();
-    onConfirmUnlock();
+    onConfirmUnlock("999888777666");
   };
 
   const isDev = process.env.NODE_ENV === "development";
@@ -140,28 +139,37 @@ export default function PaymentModal({
             <X className="w-5 h-5" />
           </button>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400 text-slate-900 mb-2 shadow-xs">
-            ⚡ 90% Launch Offer • One-Time Unlock
+            ⚡ 10-Day Pro Pass Included • ₹49 One-Time
           </div>
-          <h3 className="text-xl sm:text-2xl font-black tracking-tight">Unlock ReadyResume Pro Kit</h3>
-          <p className="text-xs text-brand-200 mt-1 max-w-xs mx-auto">
-            Full rewritten resume, all 6 STAR answers & high-resolution PDF kit.
+          <h3 className="text-xl sm:text-2xl font-black tracking-tight">
+            Unlock Full Kit + 10-Day Pro Pass
+          </h3>
+          <p className="text-xs text-brand-200 mt-1 max-w-sm mx-auto">
+            10 Tailored Resumes/Day for 10 Days • All STAR Answers • PDF Downloads
           </p>
         </div>
 
         {/* Modal Scrollable Body */}
         <div className="p-5 sm:p-7 space-y-5 overflow-y-auto flex-grow text-slate-800">
-          {/* Price Banner */}
-          <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-brand-50 border border-brand-200/80">
-            <div>
-              <div className="text-xs text-slate-500 font-medium">One-Time Fee • No Subscription</div>
-              <div className="text-2xl font-black text-slate-900 flex items-baseline gap-2">
-                ₹{unlockPrice}{" "}
-                <span className="text-xs text-slate-400 line-through font-normal">₹499</span>
-              </div>
+          {/* Price Banner with 10-Day Pro Pass Feature */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50/70 border border-brand-200/80">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-brand-800 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-brand-600" />
+                10-Day Pro Pass Access
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                10 Resumes / Day
+              </span>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-              Save ₹450 Today
-            </span>
+            <div className="text-2xl font-black text-slate-900 flex items-baseline gap-2">
+              ₹{unlockPrice}{" "}
+              <span className="text-xs text-slate-400 line-through font-normal">₹499</span>
+              <span className="text-xs font-medium text-slate-500">• One-time payment (no subscription)</span>
+            </div>
+            <p className="text-xs text-slate-600 mt-2 font-medium">
+              Unlock Full Kit + 10-Day Pro Pass (10 Tailored Resumes/Day) — ₹{unlockPrice} One-Time.
+            </p>
           </div>
 
           {/* DYNAMIC SCANNABLE UPI QR CODE & DIRECT INTENT */}
@@ -202,7 +210,7 @@ export default function PaymentModal({
               <button
                 type="button"
                 onClick={handleCopyUpi}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
               >
                 {copiedUpi ? (
                   <>
@@ -268,25 +276,25 @@ export default function PaymentModal({
             >
               <ShieldCheck className="w-4 h-4" />
               <span>
-                {isVerifying ? "Verifying Transaction..." : "I Have Paid — Unlock Full Kit"}
+                {isVerifying ? "Activating 10-Day Pro Pass..." : "I Have Paid — Activate 10-Day Pro Pass"}
               </span>
             </button>
 
             <p className="text-center text-[10px] text-slate-400 leading-tight">
-              Instant automatic verification. Once verified, all 6 questions, full rewritten resume,
-              and PDF export unlock permanently for this session.
+              Instant activation. Grants full access to all 6 interview answers, full rewritten resume,
+              clean PDF export, and up to 10 generations per day for 10 days.
             </p>
           </div>
 
-          {/* DEV-ONLY TEST UNLOCK (Hidden when NODE_ENV === 'production') */}
+          {/* DEV-ONLY TEST UNLOCK (Hidden in Production) */}
           {isDev && (
             <div className="pt-3 border-t border-dashed border-slate-200 text-center">
               <button
                 type="button"
                 onClick={handleDevUnlock}
-                className="text-[11px] text-slate-400 hover:text-brand-600 font-medium underline underline-offset-2 transition"
+                className="text-[11px] text-slate-400 hover:text-brand-600 font-medium underline underline-offset-2 transition cursor-pointer"
               >
-                🛠️ Test Unlock (Dev Only — Auto-Hidden in Production)
+                🛠️ Test Unlock (Dev Only — Simulates 10-Day Pro Pass)
               </button>
             </div>
           )}

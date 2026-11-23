@@ -195,9 +195,9 @@ export default function InterviewQuestions({
           </div>
           <button
             onClick={onOpenPaywall}
-            className="shrink-0 px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold transition shadow-md shadow-brand-500/30 flex items-center gap-2"
+            className="shrink-0 px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold transition shadow-md shadow-brand-500/30 flex items-center gap-2 cursor-pointer"
           >
-            <span>Unlock For ₹49</span>
+            <span>Unlock 10-Day Pro Pass (₹49)</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
