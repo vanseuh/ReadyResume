@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Custom Scrollbars */
+textarea::-webkit-scrollbar,
+div::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+textarea::-webkit-scrollbar-track,
+div::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 9999px;
+}
+
+textarea::-webkit-scrollbar-thumb,
+div::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover,
+div::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Paywall Blur Effects */
+.locked-blur {
+  filter: blur(5.5px);
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+.unlocked-content {
+  filter: none !important;
+  user-select: text !important;
+  pointer-events: auto !important;
+}
+
+/* Circular ATS Progress Gauge Animation */
+.score-circle-transition {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease;
+}
+
+/* Print Styles */
+@media print {
+  header,
+  footer,
+  #inputSection,
+  .no-print,
+  .btn-paywall,
+  .paywall-overlay {
+    display: none !important;
+  }
+
+  .locked-blur {
+    filter: none !important;
+  }
+}
