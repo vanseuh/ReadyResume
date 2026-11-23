@@ -3,6 +3,9 @@ import OpenAI from "openai";
 import { checkTierRateLimit, getClientIp } from "@/lib/rateLimiter";
 import { KitData } from "@/lib/types";
 
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 // Token-Conservation Constraints
 const MAX_RESUME_CHARS = 8000;     // ~1,200 words / 2–3 pages
 const MAX_JOB_CHARS = 5000;        // ~800 words
