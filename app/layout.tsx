@@ -106,7 +106,7 @@ const jsonLd = {
           "price": "0",
           "priceCurrency": "INR",
           "name": "Free ATS Score Preview",
-          "description": "3 free ATS score analyses per hour with keyword gaps and 2 interview Q&As.",
+          "description": "3 free ATS score analyses per day with keyword gaps and 2 interview Q&As.",
         },
         {
           "@type": "Offer",

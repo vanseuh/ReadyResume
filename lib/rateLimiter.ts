@@ -2,7 +2,7 @@
  * In-Memory Sliding Window & Pro Pass Rate Limiter for ReadyResume
  * 
  * Free Tier:
- * - 3 requests per IP address per hour.
+ * - 3 requests per IP address per day.
  * 
  * 10-Day Pro Pass Tier (via x-pro-utr header):
  * - Valid for 10 days from activation timestamp.
@@ -32,8 +32,7 @@ const freeTierMap = new Map<string, FreeTierRecord>();
 
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
-const FREE_MAX_HOURLY = 3;
-const FREE_MAX_DAILY = 10;
+const FREE_MAX_DAILY = 3;
 
 // Periodic cleanup every 30 minutes
 setInterval(() => {
@@ -129,7 +128,7 @@ export function checkTierRateLimit(ip: string, proUtrHeader?: string | null): Ra
   }
 
   // ==========================================
-  // 2. FREE TIER (IP-based limit: 3/hour)
+  // 2. FREE TIER (IP-based limit: 3/day)
   // ==========================================
   // Developer whitelist for localhost / local LAN testing
   if (ip === "127.0.0.1" || ip === "::1" || ip === "localhost" || ip.startsWith("192.168.")) {
@@ -148,24 +147,22 @@ export function checkTierRateLimit(ip: string, proUtrHeader?: string | null): Ra
     freeTierMap.set(ip, record);
   }
 
-  record.hourlyTimestamps = record.hourlyTimestamps.filter(t => now - t < HOUR_MS);
   record.dailyTimestamps = record.dailyTimestamps.filter(t => now - t < DAY_MS);
 
-  if (record.hourlyTimestamps.length >= FREE_MAX_HOURLY || record.dailyTimestamps.length >= FREE_MAX_DAILY) {
+  if (record.dailyTimestamps.length >= FREE_MAX_DAILY) {
     return {
       allowed: false,
       isPro: false,
-      message: "You have reached the free preview limit (3 requests per hour). Unlock the 10-Day Pro Pass for 10 generations per day!",
+      message: "You have reached the free preview limit (3 requests per day). Unlock the 10-Day Pro Pass for 10 generations per day!",
     };
   }
 
-  record.hourlyTimestamps.push(now);
   record.dailyTimestamps.push(now);
 
   return {
     allowed: true,
     isPro: false,
-    remainingToday: FREE_MAX_HOURLY - record.hourlyTimestamps.length,
+    remainingToday: FREE_MAX_DAILY - record.dailyTimestamps.length,
   };
 }
 

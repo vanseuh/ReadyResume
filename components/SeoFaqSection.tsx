@@ -17,7 +17,7 @@ const faqs: FaqItem[] = [
   {
     question: "Can I check my ATS resume score for free?",
     answer:
-      "Yes, 100% free! Every visitor can run 3 free ATS score checks per hour. You immediately see your overall match percentage, top missing keywords with severity rankings, and the first 2 role-specific interview questions without providing any credit card or creating an account.",
+      "Yes, 100% free! Every visitor can run 3 free ATS score checks per day. You immediately see your overall match percentage, top missing keywords with severity rankings, and the first 2 role-specific interview questions without providing any credit card or creating an account.",
   },
   {
     question: "Why do 75%+ of resumes get rejected by ATS software in India?",

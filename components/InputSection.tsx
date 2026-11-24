@@ -617,8 +617,8 @@ export default function InputSection({
                   />
                   <span>
                     {freeTriesRemaining > 0
-                      ? `Free Previews: ${freeTriesRemaining}/3 Remaining`
-                      : "3/3 Free Previews Used • Pro Pass Required"}
+                      ? `Free Previews: ${freeTriesRemaining}/3 Today`
+                      : "3/3 Free Previews Used Today • Pro Pass Required"}
                   </span>
                 </span>
                 {freeTriesRemaining === 0 && (
@@ -637,7 +637,7 @@ export default function InputSection({
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white transition-all shadow-lg flex items-center justify-center gap-2.5 text-base cursor-pointer bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 hover:from-amber-700 hover:to-orange-700 active:scale-[0.98] shadow-orange-600/30 ring-2 ring-amber-400"
             >
               <Zap className="w-5 h-5 text-amber-200" />
-              <span>3 Free Tries Used — Unlock Pro Pass (₹49)</span>
+              <span>3 Free Daily Tries Used — Unlock Pro Pass (₹49)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           ) : (

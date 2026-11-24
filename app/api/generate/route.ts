@@ -47,7 +47,7 @@ function isGibberishOrSpam(text: string): { isSpam: boolean; reason?: string } {
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Dual-Tier Rate Limiting (Free: 3/hr | 10-Day Pro Pass: 10/day)
+    // 1. Dual-Tier Rate Limiting (Free: 3/day | 10-Day Pro Pass: 10/day)
     const clientIp = getClientIp(req);
     const proUtrHeader = req.headers.get("x-pro-utr");
     const rateCheck = checkTierRateLimit(clientIp, proUtrHeader);

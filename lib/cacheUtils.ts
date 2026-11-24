@@ -101,7 +101,7 @@ export function validateInputQuality(resume: string, jobDescription: string): { 
 }
 
 // ==========================================
-// FREE PREVIEWS LIMIT SYSTEM (Max 3 Previews)
+// FREE PREVIEWS LIMIT SYSTEM (Max 3 Previews/Day)
 // ==========================================
 
 const FREE_USAGE_KEY = "readyresume_free_usage_count";
@@ -111,7 +111,28 @@ export function getFreeUsageCount(): number {
   if (typeof window === "undefined") return 0;
   try {
     const raw = localStorage.getItem(FREE_USAGE_KEY);
-    return raw ? Math.max(0, parseInt(raw, 10) || 0) : 0;
+    if (!raw) return 0;
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Check if JSON { date: string, count: number }
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        if (parsed.date === today) {
+          return Math.max(0, parseInt(parsed.count, 10) || 0);
+        } else {
+          // Different calendar day: reset to 0
+          localStorage.setItem(FREE_USAGE_KEY, JSON.stringify({ date: today, count: 0 }));
+          return 0;
+        }
+      }
+    } catch {
+      // Legacy plain number format: migrate to today
+      const legacyCount = parseInt(raw, 10) || 0;
+      localStorage.setItem(FREE_USAGE_KEY, JSON.stringify({ date: today, count: legacyCount }));
+      return legacyCount;
+    }
+    return 0;
   } catch {
     return 0;
   }
@@ -120,9 +141,10 @@ export function getFreeUsageCount(): number {
 export function incrementFreeUsage(): number {
   if (typeof window === "undefined") return 0;
   try {
+    const today = new Date().toISOString().slice(0, 10);
     const current = getFreeUsageCount();
     const updated = Math.min(FREE_LIMIT, current + 1);
-    localStorage.setItem(FREE_USAGE_KEY, updated.toString());
+    localStorage.setItem(FREE_USAGE_KEY, JSON.stringify({ date: today, count: updated }));
     return updated;
   } catch {
     return 0;

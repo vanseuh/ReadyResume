@@ -160,7 +160,7 @@ export default function PricingDrawer({
                     <Check className="w-3 h-3 stroke-[2.5]" />
                   </div>
                   <span className="text-slate-700">
-                    <strong>3 Free Previews per Hour</strong>
+                    <strong>3 Free Previews per Day</strong>
                   </span>
                 </li>
 

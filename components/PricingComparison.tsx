@@ -99,7 +99,7 @@ export default function PricingComparison({
                   <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                 </div>
                 <span className="text-slate-700">
-                  <strong>3 Free Previews per Hour</strong> (Instant evaluation)
+                  <strong>3 Free Previews per Day</strong> (Instant evaluation)
                 </span>
               </li>
 

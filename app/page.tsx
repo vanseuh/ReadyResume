@@ -108,7 +108,7 @@ export default function Home() {
       const currentFreeUsed = getFreeUsageCount();
       if (currentFreeUsed >= FREE_LIMIT) {
         setError(
-          "⚠️ Aapne apne 3 Free Resume Previews use kar liye hain! Naya resume tailor karne ke liye pehle ₹49 ka 10-Day Pro Pass unlock kariye."
+          "⚠️ Aapne aaj ke apne 3 Free Resume Previews use kar liye hain! Naya resume tailor karne ke liye pehle ₹49 ka 10-Day Pro Pass unlock kariye."
         );
         setIsPaywallOpen(true);
         return;
