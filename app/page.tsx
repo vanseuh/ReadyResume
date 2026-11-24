@@ -357,9 +357,13 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold">
-                R
-              </div>
+              <img
+                src="/icon.svg"
+                alt="ReadyResume Logo"
+                width={24}
+                height={24}
+                className="w-6 h-6 rounded-md shadow-xs object-contain"
+              />
               <span className="font-bold text-slate-800">ReadyResume</span>
               <span>• Self-Service ATS Career Kit & 10-Day Pro Pass</span>
             </div>
