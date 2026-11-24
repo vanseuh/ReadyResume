@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ArrowLeft, Shield, FileCheck } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Service | MakeYourResume",
-  description: "Terms and conditions for using MakeYourResume ATS Resume Checker & Career Kit tools.",
+  title: "Terms of Service | ReadyResume",
+  description: "Terms and conditions for using ReadyResume ATS Resume Checker & Career Kit tools.",
 };
 
 export default function TermsPage() {
@@ -18,7 +18,7 @@ export default function TermsPage() {
             className="inline-flex items-center gap-2 text-xs font-bold text-brand-600 hover:text-brand-800 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to MakeYourResume</span>
+            <span>Back to ReadyResume</span>
           </Link>
           <div className="flex items-center gap-2">
             <FileCheck className="w-4 h-4 text-brand-600" />
@@ -39,14 +39,14 @@ export default function TermsPage() {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900">1. Acceptance of Terms</h2>
             <p className="text-sm text-slate-600">
-              By accessing or using MakeYourResume (&quot;readyresume-in.vercel.app&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please refrain from using the platform.
+              By accessing or using ReadyResume (&quot;readyresume-in.vercel.app&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please refrain from using the platform.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900">2. Description of Service</h2>
             <p className="text-sm text-slate-600">
-              MakeYourResume provides automated ATS score evaluations, keyword gap analysis, and tailored resume optimization suggestions using artificial intelligence. Results are advisory and designed to improve hiring outcomes; however, MakeYourResume cannot guarantee interview invitations, placement, or hiring decisions by third-party employers.
+              ReadyResume provides automated ATS score evaluations, keyword gap analysis, and tailored resume optimization suggestions using artificial intelligence. Results are advisory and designed to improve hiring outcomes; however, ReadyResume cannot guarantee interview invitations, placement, or hiring decisions by third-party employers.
             </p>
           </section>
 
@@ -62,14 +62,14 @@ export default function TermsPage() {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900">4. Advertising &amp; Disclaimers</h2>
             <p className="text-sm text-slate-600">
-              MakeYourResume displays advertisements served by third-party advertising partners such as Google AdSense. We do not endorse products or services featured in third-party advertisements.
+              ReadyResume displays advertisements served by third-party advertising partners such as Google AdSense. We do not endorse products or services featured in third-party advertisements.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900">5. Limitation of Liability</h2>
             <p className="text-sm text-slate-600">
-              MakeYourResume and its operators shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use this service.
+              ReadyResume and its operators shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use this service.
             </p>
           </section>
         </div>
@@ -77,7 +77,7 @@ export default function TermsPage() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
-        <p>&copy; {new Date().getFullYear()} MakeYourResume. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} ReadyResume. All rights reserved.</p>
       </footer>
     </div>
   );

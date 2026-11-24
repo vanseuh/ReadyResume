@@ -14,8 +14,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MakeYourResume — Free ATS Resume Checker & AI Job Tailoring Tool",
-    template: "%s | MakeYourResume",
+    default: "ReadyResume — Free ATS Resume Checker & AI Job Tailoring Tool",
+    template: "%s | ReadyResume",
   },
   description:
     "Check your ATS match score for free in 30 seconds. Tailor your resume to any job description (Naukri, LinkedIn, Indeed), fix keyword gaps, and get custom STAR interview answers. One-time ₹49 10-Day Pro Pass.",
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     "ATS friendly resume format 2026",
     "free resume score checker India",
   ],
-  authors: [{ name: "MakeYourResume", url: siteUrl }],
-  creator: "MakeYourResume",
-  publisher: "MakeYourResume",
+  authors: [{ name: "ReadyResume", url: siteUrl }],
+  creator: "ReadyResume",
+  publisher: "ReadyResume",
   formatDetection: {
     email: false,
     address: false,
@@ -49,20 +49,20 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "MakeYourResume — Turn Any Job Description Into an Interview-Make Your Resume in 30 Seconds",
+    title: "ReadyResume — Turn Any Job Description Into an Interview-Ready Resume in 30 Seconds",
     description:
       "Check your ATS score for free. Get an AI-tailored resume with quantifiable bullets, keyword gap analysis, and 6 role-specific STAR interview answers.",
     url: siteUrl,
-    siteName: "MakeYourResume",
+    siteName: "ReadyResume",
     locale: "en_IN",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "MakeYourResume — Free ATS Resume Checker & AI Job Tailoring Tool",
+    title: "ReadyResume — Free ATS Resume Checker & AI Job Tailoring Tool",
     description:
       "Turn any job description into an ATS-optimized resume & STAR interview prep kit in 30 seconds. Instant ₹49 UPI Pro Pass.",
-    creator: "@MakeYourResume",
+    creator: "@ReadyResume",
   },
   icons: {
     icon: [
@@ -96,7 +96,7 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "SoftwareApplication",
-      "name": "MakeYourResume",
+      "name": "ReadyResume",
       "url": siteUrl,
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "All",
@@ -128,14 +128,14 @@ const jsonLd = {
     },
     {
       "@type": "Organization",
-      "name": "MakeYourResume",
+      "name": "ReadyResume",
       "url": siteUrl,
       "logo": `${siteUrl}/icon.svg`,
     },
     {
       "@type": "WebSite",
-      "name": "MakeYourResume",
-      "alternateName": ["Make Your Resume", "MakeYourResume India", "MakeYourResume AI"],
+      "name": "ReadyResume",
+      "alternateName": ["Ready Resume", "ReadyResume India", "ReadyResume AI"],
       "url": siteUrl,
       "description": "Free ATS Resume Match Score Checker & AI Career Kit Generator for Indian Job Seekers.",
     },
@@ -144,11 +144,11 @@ const jsonLd = {
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "How does MakeYourResume calculate my ATS Match Score?",
+          "name": "How does ReadyResume calculate my ATS Match Score?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text":
-              "MakeYourResume analyzes your resume against the specific job description by checking keyword overlap, required tools, seniority level, and quantifiable metrics to provide an accurate 0-100% ATS score.",
+              "ReadyResume analyzes your resume against the specific job description by checking keyword overlap, required tools, seniority level, and quantifiable metrics to provide an accurate 0-100% ATS score.",
           },
         },
         {
@@ -171,11 +171,11 @@ const jsonLd = {
         },
         {
           "@type": "Question",
-          "name": "Does MakeYourResume work for Indian job portals like Naukri, LinkedIn, and Indeed?",
+          "name": "Does ReadyResume work for Indian job portals like Naukri, LinkedIn, and Indeed?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text":
-              "Yes. MakeYourResume is tuned specifically for Indian hiring standards across software development, sales, marketing, banking, and fresher campus placements.",
+              "Yes. ReadyResume is tuned specifically for Indian hiring standards across software development, sales, marketing, banking, and fresher campus placements.",
           },
         },
       ],

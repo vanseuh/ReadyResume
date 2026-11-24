@@ -1,5 +1,5 @@
 /**
- * Client-Side Hashing & Session Caching Utilities for MakeYourResume
+ * Client-Side Hashing & Session Caching Utilities for ReadyResume
  * Guarantees 0-token duplicate execution when users submit identical inputs or reload the page.
  */
 

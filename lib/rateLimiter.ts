@@ -1,5 +1,5 @@
 /**
- * In-Memory Sliding Window & Pro Pass Rate Limiter for MakeYourResume
+ * In-Memory Sliding Window & Pro Pass Rate Limiter for ReadyResume
  * 
  * Free Tier:
  * - 3 requests per IP address per day.

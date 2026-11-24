@@ -283,7 +283,7 @@ ${jobDescription.trim()}`;
       const percentRemaining = (100 - parseFloat(percentUsed)).toFixed(4);
 
       console.log(`\n======================================================`);
-      console.log(`📊 [MakeYourResume Live Token Tracker]`);
+      console.log(`📊 [ReadyResume Live Token Tracker]`);
       console.log(`Request Usage: Prompt=${usage.prompt_tokens} | Completion=${usage.completion_tokens} | Total=${usage.total_tokens}`);
       console.log(`Session Cumulative: ${cumulativeTokensUsed.toLocaleString()} tokens (${percentUsed}% of 40M)`);
       console.log(`Budget Remaining: ${remainingBudget.toLocaleString()} / ${TOTAL_TOKEN_BUDGET.toLocaleString()} tokens (${percentRemaining}%)`);

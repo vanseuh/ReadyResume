@@ -170,7 +170,7 @@ export function generatePdfKit(data: KitData) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.setTextColor(30, 58, 138);
-  doc.text("MakeYourResume — Tailored Interview Preparation Master Guide", margin + 4, cursorY + 7);
+  doc.text("ReadyResume — Tailored Interview Preparation Master Guide", margin + 4, cursorY + 7);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
@@ -261,7 +261,7 @@ export function generatePdfKit(data: KitData) {
     doc.setFontSize(7.5);
     doc.setTextColor(148, 163, 184);
     doc.text(
-      `MakeYourResume — Career Accelerator Suite  |  Page ${i} of ${totalPages}`,
+      `ReadyResume — Career Accelerator Suite  |  Page ${i} of ${totalPages}`,
       pageWidth / 2,
       pageHeight - 8,
       { align: "center" }
@@ -269,5 +269,5 @@ export function generatePdfKit(data: KitData) {
   }
 
   const safeName = (r.fullName || "Candidate").replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-  doc.save(`MakeYourResume-Career-Kit-${safeName}.pdf`);
+  doc.save(`ReadyResume-Career-Kit-${safeName}.pdf`);
 }

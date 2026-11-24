@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ArrowLeft, Shield, Lock, FileText, CheckCircle2 } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy | MakeYourResume",
-  description: "MakeYourResume Privacy Policy, data protection practices, and Google AdSense cookie disclosures.",
+  title: "Privacy Policy | ReadyResume",
+  description: "ReadyResume Privacy Policy, data protection practices, and Google AdSense cookie disclosures.",
 };
 
 export default function PrivacyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPage() {
             className="inline-flex items-center gap-2 text-xs font-bold text-brand-600 hover:text-brand-800 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to MakeYourResume</span>
+            <span>Back to ReadyResume</span>
           </Link>
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-emerald-600" />
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
               1. Information We Collect &amp; Process
             </h2>
             <p className="text-sm text-slate-600">
-              MakeYourResume provides AI-powered resume analysis and tailoring. When you submit resume text, job descriptions, or uploaded PDF files to our platform:
+              ReadyResume provides AI-powered resume analysis and tailoring. When you submit resume text, job descriptions, or uploaded PDF files to our platform:
             </p>
             <ul className="list-disc pl-5 text-sm text-slate-600 space-y-1">
               <li><strong>Resume Content:</strong> Processed in-memory solely to calculate ATS match scores, detect missing keywords, and produce tailored career kits.</li>
@@ -75,14 +75,14 @@ export default function PrivacyPage() {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900">3. Cookies &amp; Browser Storage</h2>
             <p className="text-sm text-slate-600">
-              MakeYourResume uses standard browser storage (<code>localStorage</code>) to remember your active 10-Day Pro Pass, session analysis, and usage counters without requiring sign-ins or password tracking. You can clear this anytime by clicking &quot;Reset Session&quot; in the footer or clearing your browser cache.
+              ReadyResume uses standard browser storage (<code>localStorage</code>) to remember your active 10-Day Pro Pass, session analysis, and usage counters without requiring sign-ins or password tracking. You can clear this anytime by clicking &quot;Reset Session&quot; in the footer or clearing your browser cache.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900">4. Payments &amp; UPI Security</h2>
             <p className="text-sm text-slate-600">
-              All transactions for the ₹49 10-Day Pro Pass are processed directly through peer-to-peer or merchant UPI applications (Google Pay, PhonePe, Paytm, BHIM). MakeYourResume does not collect, store, or have access to your bank account numbers, UPI PINs, credit card numbers, or sensitive financial data.
+              All transactions for the ₹49 10-Day Pro Pass are processed directly through peer-to-peer or merchant UPI applications (Google Pay, PhonePe, Paytm, BHIM). ReadyResume does not collect, store, or have access to your bank account numbers, UPI PINs, credit card numbers, or sensitive financial data.
             </p>
           </section>
 
@@ -97,7 +97,7 @@ export default function PrivacyPage() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
-        <p>&copy; {new Date().getFullYear()} MakeYourResume. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} ReadyResume. All rights reserved.</p>
       </footer>
     </div>
   );

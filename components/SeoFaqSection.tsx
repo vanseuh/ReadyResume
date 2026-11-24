@@ -10,9 +10,9 @@ interface FaqItem {
 
 const faqs: FaqItem[] = [
   {
-    question: "How does MakeYourResume calculate my ATS Match Score?",
+    question: "How does ReadyResume calculate my ATS Match Score?",
     answer:
-      "MakeYourResume uses advanced LLM intelligence to evaluate your current resume against the target job description. It calculates a realistic 0–100% score based on keyword frequency, hard and soft skill overlap, seniority alignment, tool proficiency, and quantifiable impact metrics.",
+      "ReadyResume uses advanced LLM intelligence to evaluate your current resume against the target job description. It calculates a realistic 0–100% score based on keyword frequency, hard and soft skill overlap, seniority alignment, tool proficiency, and quantifiable impact metrics.",
   },
   {
     question: "Can I check my ATS resume score for free?",
@@ -32,7 +32,7 @@ const faqs: FaqItem[] = [
   {
     question: "How does the STAR method help in interview preparation?",
     answer:
-      "The STAR framework (Situation, Task, Action, Result) is the industry standard for answering behavioral and technical interview questions. MakeYourResume generates crisp, tailored STAR answers based on your experience and the target role so you can speak confidently with measurable results during interviews.",
+      "The STAR framework (Situation, Task, Action, Result) is the industry standard for answering behavioral and technical interview questions. ReadyResume generates crisp, tailored STAR answers based on your experience and the target role so you can speak confidently with measurable results during interviews.",
   },
   {
     question: "Is my personal resume data stored or shared?",
@@ -72,7 +72,7 @@ export default function SeoFaqSection() {
           </div>
           <h3 className="text-base font-bold text-slate-900 mb-2">1. Exact Keyword Density</h3>
           <p className="text-xs text-slate-600 leading-relaxed">
-            ATS scanners search for exact terminologies (e.g., &quot;PostgreSQL&quot; vs &quot;SQL databases&quot;). MakeYourResume identifies critical keyword gaps and organically weaves them into your resume bullets.
+            ATS scanners search for exact terminologies (e.g., &quot;PostgreSQL&quot; vs &quot;SQL databases&quot;). ReadyResume identifies critical keyword gaps and organically weaves them into your resume bullets.
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export default function SeoFaqSection() {
           </div>
           <h3 className="text-base font-bold text-slate-900 mb-2">2. Quantifiable Impact Bullets</h3>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Generic job descriptions fail ATS filters. MakeYourResume turns passive duties into high-impact action bullets with quantifiable metrics (%, ₹, scale, speed, team size).
+            Generic job descriptions fail ATS filters. ReadyResume turns passive duties into high-impact action bullets with quantifiable metrics (%, ₹, scale, speed, team size).
           </p>
         </div>
 

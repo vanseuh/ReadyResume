@@ -295,7 +295,7 @@ export default function ScoreCard({
             </div>
             <span className="text-emerald-500 font-bold hidden sm:inline">➔</span>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-emerald-800">Projected Score After MakeYourResume:</span>
+              <span className="text-xs font-semibold text-emerald-800">Projected Score After ReadyResume:</span>
               <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs flex items-center gap-1">
                 <span>92%–98%</span>
                 <span>✅</span>
@@ -303,7 +303,7 @@ export default function ScoreCard({
             </div>
           </div>
           <p className="text-[11px] text-slate-600 font-medium text-center md:text-right">
-            MakeYourResume rewrite injects all 5 priority keyword gaps into verified recruiter-ready bullet points.
+            ReadyResume rewrite injects all 5 priority keyword gaps into verified recruiter-ready bullet points.
           </p>
         </div>
       </div>
