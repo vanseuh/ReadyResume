@@ -130,7 +130,14 @@ const jsonLd = {
       "@type": "Organization",
       "name": "ReadyResume",
       "url": siteUrl,
-      "logo": `${siteUrl}/favicon.ico`,
+      "logo": `${siteUrl}/icon.svg`,
+    },
+    {
+      "@type": "WebSite",
+      "name": "ReadyResume",
+      "alternateName": ["Ready Resume", "ReadyResume India", "ReadyResume AI"],
+      "url": siteUrl,
+      "description": "Free ATS Resume Match Score Checker & AI Career Kit Generator for Indian Job Seekers.",
     },
     {
       "@type": "FAQPage",
