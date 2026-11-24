@@ -10,6 +10,8 @@ import PricingDrawer from "@/components/PricingDrawer";
 import PaymentModal from "@/components/PaymentModal";
 import ShareBar from "@/components/ShareBar";
 import SeoFaqSection from "@/components/SeoFaqSection";
+import GoogleAd from "@/components/GoogleAd";
+import Link from "next/link";
 import { KitData, GenerateResponse, ProPassData } from "@/lib/types";
 import {
   computeInputHash,
@@ -313,6 +315,9 @@ export default function Home() {
           onOpenPaywall={() => setIsPaywallOpen(true)}
         />
 
+        {/* Responsive Google AdSense Banner Slot */}
+        <GoogleAd adSlot="3948201948" className="max-w-4xl mx-auto my-6" />
+
         {/* RESULTS STAGE (Rendered once generated) */}
         {kitData && (
           <div id="resultsArea" className="space-y-10 animate-fade-in">
@@ -345,6 +350,9 @@ export default function Home() {
 
         {/* SEO Educational Knowledge Base & FAQ Section for Google Ranking */}
         <SeoFaqSection />
+
+        {/* Bottom Responsive Google AdSense Banner Slot */}
+        <GoogleAd adSlot="7892145321" className="max-w-4xl mx-auto mt-8" />
       </main>
 
       {/* FOOTER */}
@@ -367,7 +375,15 @@ export default function Home() {
               <span className="font-bold text-slate-800">ReadyResume</span>
               <span>• Self-Service ATS Career Kit & 10-Day Pro Pass</span>
             </div>
-            <div className="flex items-center gap-4 text-slate-500">
+            <div className="flex items-center gap-3 text-slate-500 flex-wrap justify-center">
+              <Link href="/privacy" className="text-slate-600 hover:text-brand-600 transition underline underline-offset-2">
+                Privacy Policy
+              </Link>
+              <span>•</span>
+              <Link href="/terms" className="text-slate-600 hover:text-brand-600 transition underline underline-offset-2">
+                Terms of Service
+              </Link>
+              <span>•</span>
               <button
                 type="button"
                 onClick={() => setIsPricingOpen(true)}
@@ -375,10 +391,6 @@ export default function Home() {
               >
                 Compare Plans
               </button>
-              <span>•</span>
-              <span>Server-side Llama AI</span>
-              <span>•</span>
-              <span>Zero Visitor Keys Required</span>
               <span>•</span>
               <button onClick={handleResetDemo} className="text-slate-500 hover:text-slate-700 hover:underline cursor-pointer">
                 Reset Session
