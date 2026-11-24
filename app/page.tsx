@@ -20,6 +20,10 @@ import {
   activateProPass,
   incrementProUsage,
   formatExpiryDate,
+  getFreeUsageCount,
+  incrementFreeUsage,
+  resetFreeUsage,
+  FREE_LIMIT,
 } from "@/lib/cacheUtils";
 import { AlertCircle, Sparkles } from "lucide-react";
 
@@ -31,6 +35,7 @@ export default function Home() {
   const [cacheNotice, setCacheNotice] = useState<string | null>(null);
   const [kitData, setKitData] = useState<KitData | null>(null);
   const [proPass, setProPass] = useState<ProPassData | null>(null);
+  const [freeUsageCount, setFreeUsageCount] = useState<number>(0);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
@@ -38,6 +43,9 @@ export default function Home() {
   // Restore 10-Day Pro Pass and Session from localStorage on mount (0 tokens)
   useEffect(() => {
     try {
+      // 0. Check Free usage count
+      setFreeUsageCount(getFreeUsageCount());
+
       // 1. Check active Pro Pass
       const activePass = getActiveProPass();
       if (activePass) {
@@ -63,9 +71,49 @@ export default function Home() {
     }
   }, []);
 
+  // When input changes, clear outdated analysis below so user always sees fresh data
+  const handleResumeChange = (val: string) => {
+    setResume(val);
+    if (kitData) {
+      setKitData(null);
+      setCacheNotice(null);
+    }
+  };
+
+  const handleJobChange = (val: string) => {
+    setJobDescription(val);
+    if (kitData) {
+      setKitData(null);
+      setCacheNotice(null);
+    }
+  };
+
+  const handleClearAll = () => {
+    setResume("");
+    setJobDescription("");
+    setKitData(null);
+    setError(null);
+    setCacheNotice(null);
+    try {
+      localStorage.removeItem("readyresume_last_session");
+    } catch {}
+  };
+
   const handleGenerate = async () => {
     setError(null);
     setCacheNotice(null);
+
+    // 0. Strict 3-Free-Try Cap Enforcement: If non-paying visitor has used 3 tries, halt & prompt payment
+    if (!isUnlocked && !proPass) {
+      const currentFreeUsed = getFreeUsageCount();
+      if (currentFreeUsed >= FREE_LIMIT) {
+        setError(
+          "⚠️ Aapne apne 3 Free Resume Previews use kar liye hain! Naya resume tailor karne ke liye pehle ₹49 ka 10-Day Pro Pass unlock kariye."
+        );
+        setIsPaywallOpen(true);
+        return;
+      }
+    }
 
     // 1. Enforce Daily 10/day Pro Pass Cap if active
     if (proPass) {
@@ -93,6 +141,12 @@ export default function Home() {
     const cachedKit = getCachedKit(inputHash);
 
     if (cachedKit) {
+      // Consume 1 of 3 free previews for non-paying users
+      if (!isUnlocked && !proPass) {
+        const updatedCount = incrementFreeUsage();
+        setFreeUsageCount(updatedCount);
+      }
+
       setKitData(cachedKit);
       setCacheNotice("Exact match found in cache: Loaded instantly with 0 API tokens consumed!");
       try {
@@ -139,6 +193,12 @@ export default function Home() {
       }
 
       setKitData(result.data);
+
+      // Consume 1 of 3 free previews for non-paying users
+      if (!isUnlocked && !proPass) {
+        const updatedCount = incrementFreeUsage();
+        setFreeUsageCount(updatedCount);
+      }
 
       // Increment Pro Pass daily usage if active
       if (proPass) {
@@ -196,10 +256,13 @@ export default function Home() {
       setJobDescription("");
       setError(null);
       setCacheNotice(null);
+      resetFreeUsage();
+      setFreeUsageCount(0);
       try {
         localStorage.removeItem("readyresume_last_session");
         localStorage.removeItem("readyresume_unlocked");
         localStorage.removeItem("readyresume_pro_pass");
+        localStorage.removeItem("readyresume_free_usage_count");
       } catch {}
     }
   };
@@ -251,13 +314,17 @@ export default function Home() {
         {/* INPUT STAGE */}
         <InputSection
           resume={resume}
-          setResume={setResume}
+          setResume={handleResumeChange}
           jobDescription={jobDescription}
-          setJobDescription={setJobDescription}
+          setJobDescription={handleJobChange}
+          onClear={handleClearAll}
           onGenerate={handleGenerate}
           isLoading={isLoading}
           error={error}
           cacheNotice={cacheNotice}
+          freeTriesRemaining={Math.max(0, FREE_LIMIT - freeUsageCount)}
+          isUnlocked={isUnlocked || !!proPass}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
         />
 
         {/* RESULTS STAGE (Rendered once generated) */}

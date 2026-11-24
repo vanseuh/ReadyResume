@@ -151,6 +151,19 @@ export default function PaymentModal({
 
         {/* Modal Scrollable Body */}
         <div className="p-5 sm:p-7 space-y-5 overflow-y-auto flex-grow text-slate-800">
+          {/* Prominent Cross-Device Payment Notice */}
+          <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 shadow-2xs">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <strong className="font-bold text-amber-900 block">
+                Paid from another phone or your UPI app?
+              </strong>
+              <p className="mt-0.5 text-amber-800 leading-relaxed">
+                Direct UPI transfers cannot automatically track your browser session. To activate your 10-Day Pro Pass on <strong>this device</strong>, simply enter the 12-digit UTR / UPI Reference Number from your payment receipt in <strong>Step 2 below</strong> and tap Activate!
+              </p>
+            </div>
+          </div>
+
           {/* Compact Price & Pass Banner */}
           <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50/70 border border-brand-200/80 flex items-center justify-between gap-3">
             <div>
@@ -169,11 +182,14 @@ export default function PaymentModal({
             </span>
           </div>
 
-          {/* DYNAMIC SCANNABLE UPI QR CODE & DIRECT INTENT */}
+          {/* STEP 1: DYNAMIC SCANNABLE UPI QR CODE & DIRECT INTENT */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center">
-            <div className="text-xs font-semibold text-slate-600 mb-3 flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4 text-brand-600" />
-              Scan with Any UPI App to Pay ₹{unlockPrice}
+            <div className="w-full flex items-center justify-between mb-3 border-b border-slate-200/70 pb-2">
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
+                <span className="w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center text-[10px] font-extrabold">1</span>
+                Step 1: Scan & Pay ₹{unlockPrice}
+              </span>
+              <span className="text-[10px] font-medium text-slate-500">Any UPI App</span>
             </div>
 
             {/* Dynamic Real Scannable SVG QR Code */}
@@ -225,19 +241,32 @@ export default function PaymentModal({
           </div>
 
           {/* STEP 2: PAYMENT VERIFICATION (12-DIGIT UTR) */}
-          <div className="space-y-3 pt-1">
-            <label
-              htmlFor="utrInput"
-              className="text-xs font-bold text-slate-900 flex items-center justify-between"
-            >
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                Enter 12-Digit UPI Ref / UTR Number
+          <div className="space-y-3 pt-1 bg-emerald-50/50 border border-emerald-200/80 rounded-2xl p-4 sm:p-5">
+            <div className="flex items-center justify-between border-b border-emerald-200/70 pb-2">
+              <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
+                <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-extrabold">2</span>
+                Step 2: Enter 12-Digit Reference (UTR)
               </span>
-              <span className="text-[11px] text-slate-400 font-normal">
+              <span className="text-[11px] text-slate-500 font-mono">
                 {utrNumber.trim().length}/12 Digits
               </span>
-            </label>
+            </div>
+
+            {/* Quick helper where to find UTR in apps */}
+            <div className="grid grid-cols-3 gap-1.5 text-[10px] text-slate-600 bg-white p-2.5 rounded-xl border border-slate-200/90 text-center">
+              <div>
+                <span className="font-bold text-slate-800 block">Google Pay</span>
+                <span className="text-[9px] text-slate-500">&quot;UPI transaction ID&quot;</span>
+              </div>
+              <div>
+                <span className="font-bold text-slate-800 block">PhonePe</span>
+                <span className="text-[9px] text-slate-500">&quot;UTR&quot;</span>
+              </div>
+              <div>
+                <span className="font-bold text-slate-800 block">Paytm</span>
+                <span className="text-[9px] text-slate-500">&quot;UPI Ref No.&quot;</span>
+              </div>
+            </div>
 
             <div className="relative">
               <input
@@ -249,8 +278,8 @@ export default function PaymentModal({
                   setUtrNumber(e.target.value.replace(/\D/g, ""));
                   setUtrError(null);
                 }}
-                placeholder="e.g. 402819384729"
-                className="w-full px-3.5 py-2.5 text-sm font-mono tracking-wider text-slate-900 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition placeholder:text-slate-400"
+                placeholder="Paste 12-digit UTR (e.g. 502819384729)"
+                className="w-full px-3.5 py-3 text-base font-mono tracking-widest text-slate-900 bg-white border-2 border-emerald-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition placeholder:text-slate-400 placeholder:text-xs placeholder:font-sans placeholder:tracking-normal text-center shadow-xs"
               />
             </div>
 
@@ -267,17 +296,17 @@ export default function PaymentModal({
               disabled={isVerifying || utrNumber.trim().length !== 12}
               className={`w-full py-3.5 px-6 rounded-xl font-bold text-white transition shadow-lg flex items-center justify-center gap-2 text-sm cursor-pointer ${
                 utrNumber.trim().length === 12 && !isVerifying
-                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.99] shadow-emerald-600/25"
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.99] shadow-emerald-600/30"
                   : "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
               }`}
             >
               <ShieldCheck className="w-4 h-4" />
               <span>
-                {isVerifying ? "Activating 10-Day Pro Pass..." : "I Have Paid — Activate 10-Day Pro Pass"}
+                {isVerifying ? "Activating 10-Day Pro Pass..." : "Activate 10-Day Pro Pass on This Device"}
               </span>
             </button>
 
-            <p className="text-center text-[10px] text-slate-400 leading-tight">
+            <p className="text-center text-[10px] text-slate-500 leading-tight">
               Instant activation. Grants full access to all 6 interview answers, full rewritten resume,
               clean PDF export, and up to 10 generations per day for 10 days.
             </p>

@@ -25,9 +25,13 @@ interface InputSectionProps {
   jobDescription: string;
   setJobDescription: (val: string) => void;
   onGenerate: () => void;
+  onClear?: () => void;
   isLoading: boolean;
   error: string | null;
   cacheNotice?: string | null;
+  freeTriesRemaining: number;
+  isUnlocked: boolean;
+  onOpenPaywall: () => void;
 }
 
 export const MAX_RESUME_CHARS = 8000;
@@ -41,9 +45,13 @@ export default function InputSection({
   jobDescription,
   setJobDescription,
   onGenerate,
+  onClear,
   isLoading,
   error,
   cacheNotice,
+  freeTriesRemaining,
+  isUnlocked,
+  onOpenPaywall,
 }: InputSectionProps) {
   const [copiedResume, setCopiedResume] = useState(false);
   const [copiedJob, setCopiedJob] = useState(false);
@@ -182,6 +190,9 @@ export default function InputSection({
   const handleLoadSample = (key: string) => {
     const tmpl = SAMPLE_TEMPLATES[key];
     if (!tmpl) return;
+    if (onClear) {
+      onClear();
+    }
     setResume(tmpl.resume);
     setJobDescription(tmpl.jobDescription);
     setActiveSampleId(key);
@@ -193,6 +204,9 @@ export default function InputSection({
     setJobDescription("");
     setActiveSampleId(null);
     setSampleTip(null);
+    if (onClear) {
+      onClear();
+    }
   };
 
   return (
@@ -561,9 +575,9 @@ export default function InputSection({
           </div>
         </div>
 
-        {/* Validation Warning & Submit Button */}
+        {/* Validation Warning, Free Counter & Submit Button */}
         <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-slate-500 flex flex-col gap-1.5">
             {rLen > MAX_RESUME_CHARS || jLen > MAX_JOB_CHARS ? (
               <span className="text-rose-600 font-medium flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
@@ -585,31 +599,72 @@ export default function InputSection({
                 Inputs validated • 0-token duplicate cache active
               </span>
             )}
+
+            {/* Free Tries Counter Badge */}
+            {!isUnlocked && (
+              <div className="flex items-center gap-2 mt-1">
+                <span
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition ${
+                    freeTriesRemaining > 0
+                      ? "bg-amber-50 text-amber-900 border-amber-300"
+                      : "bg-rose-50 text-rose-900 border-rose-300 animate-pulse"
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      freeTriesRemaining > 0 ? "bg-amber-500" : "bg-rose-500"
+                    }`}
+                  />
+                  <span>
+                    {freeTriesRemaining > 0
+                      ? `Free Previews: ${freeTriesRemaining}/3 Remaining`
+                      : "3/3 Free Previews Used • Pro Pass Required"}
+                  </span>
+                </span>
+                {freeTriesRemaining === 0 && (
+                  <span className="text-[11px] text-rose-600 font-semibold">
+                    Unlock ₹49 Pro Pass to generate tailored resumes.
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
-          <button
-            type="button"
-            onClick={onGenerate}
-            disabled={!isFormValid}
-            className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white transition-all shadow-lg flex items-center justify-center gap-2.5 text-base cursor-pointer ${
-              isFormValid
-                ? "bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 active:scale-[0.98] shadow-brand-500/25"
-                : "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Making Your Resume Ready...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                <span>Make My Resume Ready</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
+          {!isUnlocked && freeTriesRemaining === 0 ? (
+            <button
+              type="button"
+              onClick={onOpenPaywall}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white transition-all shadow-lg flex items-center justify-center gap-2.5 text-base cursor-pointer bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 hover:from-amber-700 hover:to-orange-700 active:scale-[0.98] shadow-orange-600/30 ring-2 ring-amber-400"
+            >
+              <Zap className="w-5 h-5 text-amber-200" />
+              <span>3 Free Tries Used — Unlock Pro Pass (₹49)</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onGenerate}
+              disabled={!isFormValid}
+              className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white transition-all shadow-lg flex items-center justify-center gap-2.5 text-base cursor-pointer ${
+                isFormValid
+                  ? "bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 active:scale-[0.98] shadow-brand-500/25"
+                  : "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Making Your Resume Ready...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-5 h-5" />
+                  <span>Make My Resume Ready</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </section>

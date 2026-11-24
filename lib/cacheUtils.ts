@@ -101,6 +101,42 @@ export function validateInputQuality(resume: string, jobDescription: string): { 
 }
 
 // ==========================================
+// FREE PREVIEWS LIMIT SYSTEM (Max 3 Previews)
+// ==========================================
+
+const FREE_USAGE_KEY = "readyresume_free_usage_count";
+export const FREE_LIMIT = 3;
+
+export function getFreeUsageCount(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const raw = localStorage.getItem(FREE_USAGE_KEY);
+    return raw ? Math.max(0, parseInt(raw, 10) || 0) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function incrementFreeUsage(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const current = getFreeUsageCount();
+    const updated = Math.min(FREE_LIMIT, current + 1);
+    localStorage.setItem(FREE_USAGE_KEY, updated.toString());
+    return updated;
+  } catch {
+    return 0;
+  }
+}
+
+export function resetFreeUsage(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(FREE_USAGE_KEY);
+  } catch {}
+}
+
+// ==========================================
 // 10-DAY PRO PASS SYSTEM (10 generations/day)
 // ==========================================
 

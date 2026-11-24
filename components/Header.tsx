@@ -85,13 +85,22 @@ export default function Header({
                 </span>
               </span>
             ) : (
-              <button
-                onClick={onOpenPaywall}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition shadow-xs cursor-pointer"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Unlock 10-Day Pro Pass (₹49)</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onOpenPaywall}
+                  className="hidden md:inline-flex items-center gap-1 text-xs text-brand-700 hover:text-brand-900 font-bold underline underline-offset-2 transition cursor-pointer px-2 py-1"
+                >
+                  Already Paid? Enter UTR
+                </button>
+                <button
+                  onClick={onOpenPaywall}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition shadow-xs cursor-pointer"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Unlock 10-Day Pro Pass (₹49)</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
