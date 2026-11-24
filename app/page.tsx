@@ -376,6 +376,10 @@ export default function Home() {
               <span>• Self-Service ATS Career Kit & 10-Day Pro Pass</span>
             </div>
             <div className="flex items-center gap-3 text-slate-500 flex-wrap justify-center">
+              <Link href="/tutorial" className="text-brand-600 hover:text-brand-800 font-semibold transition underline underline-offset-2">
+                Tutorial Guide
+              </Link>
+              <span>•</span>
               <Link href="/privacy" className="text-slate-600 hover:text-brand-600 transition underline underline-offset-2">
                 Privacy Policy
               </Link>
