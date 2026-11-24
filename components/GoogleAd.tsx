@@ -25,7 +25,7 @@ export default function GoogleAd({
   const isPushed = useRef(false);
 
   const clientId =
-    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-XXXXXXXXXXXXXXXX";
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-5821522831605115";
 
   useEffect(() => {
     if (isPushed.current) return;
