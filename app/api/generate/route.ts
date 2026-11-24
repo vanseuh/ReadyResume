@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { checkTierRateLimit, getClientIp, logActivity, logTransaction } from "@/lib/rateLimiter";
 import { KitData } from "@/lib/types";
+import { extractWords } from "@/lib/cacheUtils";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -17,7 +18,7 @@ let cumulativeTokensUsed = 0;
 const TOTAL_TOKEN_BUDGET = 40_000_000;
 
 function isGibberishOrSpam(text: string): { isSpam: boolean; reason?: string } {
-  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+  const words = extractWords(text);
   if (words.length < MIN_WORDS) {
     return {
       isSpam: true,

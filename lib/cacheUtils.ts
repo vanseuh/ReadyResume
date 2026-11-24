@@ -53,11 +53,29 @@ export function saveCachedKit(hash: string, data: KitData): void {
 }
 
 /**
+ * Accurately extracts individual words from text.
+ * Separates words by whitespace, slashes, commas, dashes, bullets, and punctuation.
+ * Correctly counts lists without spaces (e.g. "React,Node,AWS"), hyphenated terms,
+ * and ignores non-word symbols like bullets (•, -).
+ */
+export function extractWords(text: string): string[] {
+  if (!text || typeof text !== "string") return [];
+  const normalized = text
+    .replace(/[\/\\,;:()[\]{}•*—–\-_|<>~`"?!+=#%^&$@\r\n\t]/g, " ")
+    .replace(/\.(?=\s|$)/g, " ");
+  return normalized.trim().split(/\s+/).filter(w => w.length > 0 && !/^[\W_]+$/.test(w));
+}
+
+export function countWords(text: string): number {
+  return extractWords(text).length;
+}
+
+/**
  * Validates text against low word counts or repetitive gibberish.
  */
 export function validateInputQuality(resume: string, jobDescription: string): { isValid: boolean; error?: string } {
-  const rWords = resume.trim().split(/\s+/).filter(w => w.length > 0);
-  const jWords = jobDescription.trim().split(/\s+/).filter(w => w.length > 0);
+  const rWords = extractWords(resume);
+  const jWords = extractWords(jobDescription);
 
   if (rWords.length < 15) {
     return {

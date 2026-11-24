@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Sparkles,
   Calendar,
+  HelpCircle,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import confetti from "canvas-confetti";
@@ -252,20 +253,36 @@ export default function PaymentModal({
               </span>
             </div>
 
-            {/* Quick helper where to find UTR in apps */}
-            <div className="grid grid-cols-3 gap-1.5 text-[10px] text-slate-600 bg-white p-2.5 rounded-xl border border-slate-200/90 text-center">
-              <div>
-                <span className="font-bold text-slate-800 block">Google Pay</span>
-                <span className="text-[9px] text-slate-500">&quot;UPI transaction ID&quot;</span>
+            {/* Detailed "After payment how to get UTR No." Guide */}
+            <div className="bg-amber-50/90 border border-amber-200/90 rounded-xl p-3 text-xs text-slate-800 space-y-2">
+              <div className="flex items-center gap-1.5 font-bold text-amber-900 text-xs">
+                <HelpCircle className="w-4 h-4 text-amber-700 shrink-0" />
+                <span>After Payment: How to get your 12-Digit UTR Number?</span>
               </div>
-              <div>
-                <span className="font-bold text-slate-800 block">PhonePe</span>
-                <span className="text-[9px] text-slate-500">&quot;UTR&quot;</span>
+              <p className="text-[11px] text-slate-600 leading-snug">
+                UPI app me payment hone ke baad receipt me <strong>12-digit number</strong> milta hai:
+              </p>
+              <div className="space-y-1.5 text-[11px] bg-white p-2.5 rounded-lg border border-amber-200/70">
+                <div className="flex items-start gap-1.5">
+                  <span className="font-bold text-blue-700 shrink-0">Google Pay:</span>
+                  <span className="text-slate-700">Open <strong>History</strong> &gt; tap ₹49 payment &gt; copy <strong>&quot;UPI transaction ID&quot;</strong></span>
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <span className="font-bold text-purple-700 shrink-0">PhonePe:</span>
+                  <span className="text-slate-700">Open <strong>History</strong> &gt; tap ₹49 payment &gt; <strong>Transfer Details</strong> &gt; copy <strong>&quot;UTR&quot;</strong></span>
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <span className="font-bold text-sky-700 shrink-0">Paytm:</span>
+                  <span className="text-slate-700">Open <strong>Balance &amp; History</strong> &gt; tap payment &gt; copy <strong>&quot;UPI Ref No.&quot;</strong></span>
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <span className="font-bold text-emerald-700 shrink-0">BHIM / Other:</span>
+                  <span className="text-slate-700">Transaction details me <strong>&quot;UPI Ref ID&quot;</strong> ya <strong>&quot;UTR&quot;</strong> dekhein</span>
+                </div>
               </div>
-              <div>
-                <span className="font-bold text-slate-800 block">Paytm</span>
-                <span className="text-[9px] text-slate-500">&quot;UPI Ref No.&quot;</span>
-              </div>
+              <p className="text-[10px] text-amber-800 font-medium">
+                👉 Us 12-digit number ko neeche wale box me paste karein aur Activate dabayein!
+              </p>
             </div>
 
             <div className="relative">

@@ -280,20 +280,6 @@ export default function Home() {
         onOpenPricing={() => setIsPricingOpen(true)}
       />
 
-      {/* RIGHT-SIDEBAR BUTTON TRIGGER (Docked to Right Edge) */}
-      <button
-        type="button"
-        onClick={() => setIsPricingOpen(true)}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-30 bg-white/95 hover:bg-brand-50 text-slate-700 hover:text-brand-700 border-y border-l border-slate-300 shadow-lg py-3 px-1.5 rounded-l-xl text-xs font-bold transition flex flex-col items-center gap-1.5 cursor-pointer group"
-        title="Open Plan Comparison Sidebar (Free vs ₹49 Pro Pass)"
-        aria-label="Compare Plans"
-      >
-        <Sparkles className="w-3.5 h-3.5 text-brand-600 group-hover:scale-110 transition" />
-        <span className="[writing-mode:vertical-rl] tracking-wider text-[10px] uppercase font-bold text-slate-600 group-hover:text-brand-700">
-          Compare Plans
-        </span>
-      </button>
-
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Pro Daily Cap Warning Banner */}
         {proPass && remainingToday === 0 && (

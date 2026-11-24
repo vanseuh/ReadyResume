@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { SAMPLE_TEMPLATES } from "@/lib/sampleTemplates";
 import { extractTextFromPdfFile } from "@/lib/pdfParser";
+import { countWords } from "@/lib/cacheUtils";
 
 interface InputSectionProps {
   resume: string;
@@ -152,8 +153,8 @@ export default function InputSection({
   const rLen = resume.trim().length;
   const jLen = jobDescription.trim().length;
 
-  const rWords = resume.trim().split(/\s+/).filter(w => w.length > 0).length;
-  const jWords = jobDescription.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const rWords = countWords(resume);
+  const jWords = countWords(jobDescription);
 
   const isResumeLengthValid = rLen >= MIN_CHARS && rLen <= MAX_RESUME_CHARS;
   const isJobLengthValid = jLen >= MIN_CHARS && jLen <= MAX_JOB_CHARS;
