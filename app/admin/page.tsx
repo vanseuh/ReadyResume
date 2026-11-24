@@ -133,7 +133,7 @@ export default function AdminPage() {
               <Lock className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">ReadyResume Admin</h1>
+              <h1 className="text-xl font-bold text-white tracking-tight">MakeYourResume Admin</h1>
               <p className="text-xs text-slate-400">Owner Portal & Analytics</p>
             </div>
           </div>
@@ -196,14 +196,14 @@ export default function AdminPage() {
           <div className="flex items-center gap-3">
             <img
               src="/icon.svg"
-              alt="ReadyResume"
+              alt="MakeYourResume"
               width={36}
               height={36}
               className="w-9 h-9 rounded-lg shadow-md shadow-brand-500/20 object-contain"
             />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-white text-base tracking-tight">ReadyResume</span>
+                <span className="font-bold text-white text-base tracking-tight">MakeYourResume</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
                   ADMIN PORTAL
                 </span>

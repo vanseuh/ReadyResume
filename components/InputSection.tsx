@@ -219,9 +219,9 @@ export default function InputSection({
           <span>Zero Configuration • Instant AI Analysis</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
-          <span className="text-brand-600">ReadyResume</span> — Turn Any Job Description Into an <br className="hidden sm:inline" />
+          <span className="text-brand-600">MakeYourResume</span> — Turn Any Job Description Into an <br className="hidden sm:inline" />
           <span className="bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent">
-            Interview-Ready Resume
+            Interview-Make Your Resume
           </span>{" "}
           in 30 Seconds.
         </h1>

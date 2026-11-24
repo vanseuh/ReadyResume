@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Complete Tutorial: How to Use ReadyResume to Pass ATS Filters",
-  description: "Step-by-step tutorial guide on checking your ATS resume score, fixing keyword gaps, and generating interview prep kits with ReadyResume.",
+  title: "Complete Tutorial: How to Use MakeYourResume to Pass ATS Filters",
+  description: "Step-by-step tutorial guide on checking your ATS resume score, fixing keyword gaps, and generating interview prep kits with MakeYourResume.",
 };
 
 export default function TutorialPage() {
@@ -37,12 +37,12 @@ export default function TutorialPage() {
           <div className="flex items-center gap-2">
             <img
               src="/icon.svg"
-              alt="ReadyResume Logo"
+              alt="MakeYourResume Logo"
               width={28}
               height={28}
               className="w-7 h-7 rounded-lg object-contain shadow-xs"
             />
-            <span className="font-bold text-slate-900 text-sm hidden sm:inline">ReadyResume Tutorial Guide</span>
+            <span className="font-bold text-slate-900 text-sm hidden sm:inline">MakeYourResume Tutorial Guide</span>
           </div>
           <Link
             href="/"
@@ -63,12 +63,12 @@ export default function TutorialPage() {
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
             How to Beat the ATS &amp; Land 3x More Interviews with{" "}
             <span className="bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent">
-              ReadyResume
+              MakeYourResume
             </span>
           </h1>
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Over 75% of resumes are automatically filtered out by Applicant Tracking Systems (ATS) on Naukri,
-            LinkedIn, and Indeed. Here is how to use ReadyResume to optimize your resume in under 2 minutes.
+            LinkedIn, and Indeed. Here is how to use MakeYourResume to optimize your resume in under 2 minutes.
           </p>
         </div>
       </section>
@@ -123,7 +123,7 @@ export default function TutorialPage() {
             </h2>
           </div>
           <p className="text-sm text-slate-600 leading-relaxed">
-            Hit the large purple gradient button at the bottom. In less than 15 seconds, ReadyResume analyzes your profile and displays:
+            Hit the large purple gradient button at the bottom. In less than 15 seconds, MakeYourResume analyzes your profile and displays:
           </p>
           <ul className="space-y-2 text-xs sm:text-sm text-slate-700">
             <li className="flex items-start gap-2">
@@ -153,7 +153,7 @@ export default function TutorialPage() {
           </div>
           <p className="text-sm text-slate-600 leading-relaxed">
             Interviews in 2026 evaluate candidate responses using the <strong>STAR method (Situation, Task, Action, Result)</strong>.
-            ReadyResume crafts 6 custom behavioral and technical interview questions specifically derived from your target job description and your past work history.
+            MakeYourResume crafts 6 custom behavioral and technical interview questions specifically derived from your target job description and your past work history.
           </p>
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs text-slate-600 space-y-1">
             <span className="font-bold text-slate-900 block">✨ What you get:</span>
@@ -197,7 +197,7 @@ export default function TutorialPage() {
             Ready to check your ATS score?
           </span>
           <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Try ReadyResume Free — 3 Free Tries Every Day!
+            Try MakeYourResume Free — 3 Free Tries Every Day!
           </h3>
           <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
             No credit card, no registration required. Discover your match percentage in 30 seconds.
@@ -207,7 +207,7 @@ export default function TutorialPage() {
               href="/"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-slate-950 bg-white hover:bg-slate-100 transition shadow-lg text-sm"
             >
-              <span>Go to ReadyResume Tool</span>
+              <span>Go to MakeYourResume Tool</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -218,7 +218,7 @@ export default function TutorialPage() {
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
         <div className="max-w-4xl mx-auto flex items-center justify-between px-4">
           <Link href="/" className="font-bold text-slate-800 hover:text-brand-600 transition">
-            ReadyResume
+            MakeYourResume
           </Link>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:underline">Privacy Policy</Link>

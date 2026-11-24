@@ -52,14 +52,14 @@ export default function Header({
           <div className="flex items-center gap-3">
             <img
               src="/icon.svg"
-              alt="ReadyResume Logo"
+              alt="MakeYourResume Logo"
               width={40}
               height={40}
               className="w-10 h-10 rounded-xl shadow-md shadow-brand-500/20 object-contain hover:scale-105 transition-transform"
             />
             <div>
               <span className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1">
-                Ready<span className="text-brand-600">Resume</span>
+                Make<span className="text-brand-600">YourResume</span>
               </span>
               <p className="text-[10px] sm:text-xs text-slate-500 font-medium leading-none">
                 ATS Resume & Interview Suite

@@ -36,13 +36,13 @@ export default function PaymentModal({
 
   // Environment variables with production-ready fallbacks
   const upiId = process.env.NEXT_PUBLIC_UPI_ID || "yourname@okaxis";
-  const merchantName = process.env.NEXT_PUBLIC_MERCHANT_NAME || "ReadyResume";
+  const merchantName = process.env.NEXT_PUBLIC_MERCHANT_NAME || "MakeYourResume";
   const unlockPrice = process.env.NEXT_PUBLIC_UNLOCK_PRICE || "49";
 
   // Standard NPCI UPI Intent URI
   const upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
     merchantName
-  )}&am=${unlockPrice}&cu=INR&tn=${encodeURIComponent("ReadyResume 10-Day Pro Pass")}`;
+  )}&am=${unlockPrice}&cu=INR&tn=${encodeURIComponent("MakeYourResume 10-Day Pro Pass")}`;
 
   const triggerCelebration = () => {
     try {

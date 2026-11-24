@@ -2,8 +2,8 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "ReadyResume — AI ATS Resume Optimizer & Career Kit",
-    short_name: "ReadyResume",
+    name: "MakeYourResume — AI ATS Resume Optimizer & Career Kit",
+    short_name: "MakeYourResume",
     description: "Check your ATS match score for free. Tailor your resume to any job description and unlock 6 role-specific STAR interview answers with a one-time ₹49 Pro Pass.",
     start_url: "/",
     display: "standalone",

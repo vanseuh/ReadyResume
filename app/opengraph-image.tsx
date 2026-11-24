@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "ReadyResume — Free ATS Resume Checker & Job Tailoring Tool";
+export const alt = "MakeYourResume — Free ATS Resume Checker & Job Tailoring Tool";
 export const size = {
   width: 1200,
   height: 630,
@@ -45,7 +45,7 @@ export default async function Image() {
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span style={{ fontSize: "32px", fontWeight: "800", letterSpacing: "-0.5px" }}>
-              ReadyResume
+              MakeYourResume
             </span>
             <span style={{ fontSize: "16px", color: "#94a3b8" }}>
               AI ATS Career Kit & Interview Prep
@@ -64,7 +64,7 @@ export default async function Image() {
             }}
           >
             Turn Any Job Description Into An{" "}
-            <span style={{ color: "#38bdf8" }}>Interview-Ready Resume</span> In 30 Seconds.
+            <span style={{ color: "#38bdf8" }}>Interview-Make Your Resume</span> In 30 Seconds.
           </div>
           <p style={{ fontSize: "22px", color: "#94a3b8", lineHeight: 1.4 }}>
             Free instant ATS match score, keyword gap analysis, and 6 role-specific STAR interview answers.

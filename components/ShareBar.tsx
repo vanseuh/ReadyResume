@@ -17,7 +17,7 @@ export default function ShareBar({ compact = false }: ShareBarProps) {
     return "https://readyresume.vercel.app";
   };
 
-  const shareText = "Turn any job description into an interview-ready resume & ATS score in 30 seconds with ReadyResume: ";
+  const shareText = "Turn any job description into an interview-ready resume & ATS score in 30 seconds with MakeYourResume: ";
 
   const handleCopyLink = async () => {
     try {
@@ -33,7 +33,7 @@ export default function ShareBar({ compact = false }: ShareBarProps) {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: "ReadyResume — Interview-Ready Resumes in 30 Seconds",
+          title: "MakeYourResume — Interview-Make Your Resumes in 30 Seconds",
           text: "Check your ATS match score for free and get tailored STAR interview questions.",
           url: getShareUrl(),
         });
@@ -47,15 +47,15 @@ export default function ShareBar({ compact = false }: ShareBarProps) {
 
   const shareUrl = getShareUrl();
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + shareUrl)}`;
-  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent("Check your resume ATS match score in 30 seconds with ReadyResume")}`;
-  const mailUrl = `mailto:?subject=${encodeURIComponent("Check your resume ATS score with ReadyResume")}&body=${encodeURIComponent("Hey! Check your ATS match score for free and unlock a tailored resume with ReadyResume:\n\n" + shareUrl)}`;
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent("Check your resume ATS match score in 30 seconds with MakeYourResume")}`;
+  const mailUrl = `mailto:?subject=${encodeURIComponent("Check your resume ATS score with MakeYourResume")}&body=${encodeURIComponent("Hey! Check your ATS match score for free and unlock a tailored resume with MakeYourResume:\n\n" + shareUrl)}`;
   const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
 
   if (compact) {
     return (
       <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
         <span className="font-semibold text-slate-700 flex items-center gap-1">
-          <Share2 className="w-3.5 h-3.5 text-brand-600" /> Share ReadyResume:
+          <Share2 className="w-3.5 h-3.5 text-brand-600" /> Share MakeYourResume:
         </span>
         <a
           href={whatsappUrl}
@@ -111,7 +111,7 @@ export default function ShareBar({ compact = false }: ShareBarProps) {
           <span>Pay It Forward</span>
         </div>
         <h4 className="text-base sm:text-lg font-bold text-slate-900">
-          Share ReadyResume with Job-Hunting Friends
+          Share MakeYourResume with Job-Hunting Friends
         </h4>
         <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
           Help colleagues and batchmates beat the recruiter ATS filter with free instant resume scoring.

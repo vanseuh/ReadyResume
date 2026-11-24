@@ -367,12 +367,12 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <img
                 src="/icon.svg"
-                alt="ReadyResume Logo"
+                alt="MakeYourResume Logo"
                 width={24}
                 height={24}
                 className="w-6 h-6 rounded-md shadow-xs object-contain"
               />
-              <span className="font-bold text-slate-800">ReadyResume</span>
+              <span className="font-bold text-slate-800">MakeYourResume</span>
               <span>• Self-Service ATS Career Kit & 10-Day Pro Pass</span>
             </div>
             <div className="flex items-center gap-3 text-slate-500 flex-wrap justify-center">
